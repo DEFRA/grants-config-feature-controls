@@ -39,7 +39,7 @@ services:
 
   ################################################################################
 
-  cdp-node-backend-template:
+  grants-config-feature-controls:
     build:
       context: .
       target: development
