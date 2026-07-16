@@ -11,9 +11,10 @@ ARG PORT_DEBUG
 ENV PORT=${PORT}
 EXPOSE ${PORT} ${PORT_DEBUG}
 
-COPY --chown=node:node package*.json ./
+COPY --chown=node:node --chmod=755 package*.json ./
 RUN npm install
-COPY --chown=node:node ./src ./src
+COPY --chown=node:node --chmod=755 ./src ./src
+COPY --chown=node:node --chmod=755 feature-controls ./feature-controls
 
 CMD [ "npm", "run", "docker:dev" ]
 
@@ -29,6 +30,7 @@ USER node
 
 COPY --from=development /home/node/package*.json ./
 COPY --from=development /home/node/src ./src/
+COPY --from=development /home/node/feature-controls ./feature-controls/
 
 RUN npm ci --omit=dev
 

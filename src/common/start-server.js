@@ -1,6 +1,6 @@
 import { config } from '#/config.js'
-
 import { createServer } from '#/server.js'
+import { informBrokerOfFeatureControls } from '#/services/feature-control-store-and-inform.js'
 
 export async function startServer() {
   const server = await createServer()
@@ -10,6 +10,8 @@ export async function startServer() {
   server.logger.info(
     `Access your backend on http://localhost:${config.get('port')}`
   )
+
+  await informBrokerOfFeatureControls(server.logger.child({}))
 
   return server
 }

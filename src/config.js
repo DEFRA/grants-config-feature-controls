@@ -112,13 +112,6 @@ export const config = convict({
       }
     }
   },
-  httpProxy: {
-    doc: 'HTTP Proxy URL',
-    format: String,
-    nullable: true,
-    default: null,
-    env: 'HTTP_PROXY'
-  },
   tracing: {
     header: {
       doc: 'CDP tracing header name',
