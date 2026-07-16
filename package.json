@@ -33,6 +33,7 @@
     "@aws-sdk/credential-providers": "3.1050.0",
     "@defra/cdp-auditing": "0.6.1",
     "@defra/cdp-metrics": "0.5.0",
+    "@defra/grants-config-utils": "0.6.0",
     "@defra/hapi-secure-context": "0.4.0",
     "@defra/hapi-tracing": "1.30.0",
     "@elastic/ecs-pino-format": "1.5.0",
@@ -49,15 +50,22 @@
     "pino": "10.3.1"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "4.1.8",
+    "@vitest/coverage-v8": "4.1.10",
     "eslint": "9.39.2",
     "husky": "9.1.7",
     "neostandard": "0.13.0",
     "npm-run-all": "4.1.5",
     "pino-pretty": "13.1.3",
     "prettier": "3.8.2",
-    "vitest": "4.1.8",
+    "vitest": "4.1.10",
     "vitest-fetch-mock": "0.4.5",
     "vitest-mongodb": "1.0.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DEFRA/grants-config-feature-controls.git"
   }
 }

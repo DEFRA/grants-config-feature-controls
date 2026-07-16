@@ -5,41 +5,36 @@ updates:
   - package-ecosystem: npm
     directory: /
     open-pull-requests-limit: 10
-
-    # Group packages into shared PR
+    cooldown:
+      default-days: 7
+    # Group packages into a shared PR
     groups:
       lint:
         patterns:
           - 'prettier'
           - 'stylelint'
           - 'stylelint-*'
-
       logging:
         patterns:
           - '*-pino'
           - '*-pino-format'
           - 'pino'
           - 'pino-*'
-
       tools:
         patterns:
           - 'husky'
           - 'vitest'
           - 'nodemon'
           - 'npm-run-all'
-
     ignore:
       - dependency-name: 'eslint-*'
       - dependency-name: 'eslint'
-
-    # Schedule run every Monday, local time
     schedule:
       interval: weekly
+      day: monday
       time: '10:30'
       timezone: 'Europe/London'
-
     versioning-strategy: increase
-
     allow:
       # Include direct package.json updates
       - dependency-type: direct
@@ -47,9 +42,17 @@ updates:
   # Update GitHub Actions
   - package-ecosystem: github-actions
     directory: /
-
-    # Schedule run every Monday, local time
     schedule:
       interval: weekly
+      day: monday
+      time: '10:30'
+      timezone: 'Europe/London'
+
+  # Update Docker
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
       time: '10:30'
       timezone: 'Europe/London'

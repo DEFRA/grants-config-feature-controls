@@ -18,27 +18,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v6
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #7.0.0
         with:
-          fetch-depth: 0 # Depth 0 is required for branch-based versioning
+          fetch-depth: 0
 
-      - uses: actions/setup-node@v6
+      - name: Test code and Create Test Coverage Reports
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e #6.4.0
         with:
           node-version-file: .nvmrc
           cache: npm
+      - run: |
+          npm ci
+          npm test
 
-      # Ensure tests pass. Add more checks if required
-      - run: npm ci
-      - run: npm test
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@713881670b6b3676cda39549040e2d88c70d582e #8.2.0
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Publish Hot Fix
         uses: DEFRA/cdp-build-action/build-hotfix@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-
-#     - run: npm install && npm test
-#     - name: SonarCloud Scan
-#       uses: SonarSource/sonarqube-scan-action@v5.3.1 #  (or check latest version on https://github.com/marketplace/actions/official-sonarqube-scan)
-#       env:
-#         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
