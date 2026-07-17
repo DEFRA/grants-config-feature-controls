@@ -119,6 +119,20 @@ export const config = convict({
       default: 'x-cdp-request-id',
       env: 'TRACING_HEADER'
     }
+  },
+  configBroker: {
+    baseUrl: {
+      doc: 'The base URL for the config broker',
+      format: 'url',
+      default: 'http://localhost:3002',
+      env: 'CONFIG_BROWSER_BASE_URL'
+    }
+  },
+  serviceDeployer: {
+    doc: 'The name of the person deploying the service',
+    format: String,
+    default: 'system',
+    env: 'CDP_SERVICE_DEPLOYED_BY' //This is not confirmed yet as they haven't yet implemented it
   }
 })
 

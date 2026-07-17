@@ -1,0 +1,17 @@
+---
+name: TEST_FEATURE_CONTROL
+type: boolean
+description: test feature control for a toggle type
+scopes:
+  - service.config-management
+owner: Grants Framework
+expiryDate: 2027-01-01
+initial_value:
+  - name: default
+    value: false
+  - name: test
+    value: true
+environments:
+  - dev
+  - test
+  - perf-test

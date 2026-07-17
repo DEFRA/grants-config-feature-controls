@@ -12,7 +12,17 @@ describe('#startServer', () => {
     startServerImport = await import('./start-server.js')
     const createServerImport = await import('../server.js')
 
-    createServerSpy = vi.spyOn(createServerImport, 'createServer')
+    const mockServer = {
+      start: vi.fn().mockResolvedValue(),
+      logger: {
+        info: vi.fn(),
+        child: vi.fn().mockReturnThis()
+      }
+    }
+
+    createServerSpy = vi
+      .spyOn(createServerImport, 'createServer')
+      .mockResolvedValue(mockServer)
     hapiServerSpy = vi.spyOn(hapi, 'server')
   })
 
@@ -20,15 +30,14 @@ describe('#startServer', () => {
     vi.resetAllMocks()
   })
 
-  // describe('When server starts', () => {
-  //   test('Should start up server as expected', async () => {
-  //     await startServerImport.startServer()
-  //
-  //     expect(createServerSpy).toHaveBeenCalled()
-  //     expect(hapiServerSpy).toHaveBeenCalled()
-  //     expect(informBrokerOfFeatureControls).toHaveBeenCalled()
-  //   })
-  // })
+  describe('When server starts', () => {
+    test('Should start up server as expected', async () => {
+      await startServerImport.startServer()
+
+      expect(createServerSpy).toHaveBeenCalled()
+      expect(informBrokerOfFeatureControls).toHaveBeenCalled()
+    })
+  })
 
   describe('When server start fails', () => {
     test('Should log failed startup message', async () => {
