@@ -1,97 +1,91 @@
-// import { readFileSync, existsSync, lstatSync, readdirSync } from "node:fs";
+import { readFileSync, readdirSync, existsSync } from 'node:fs'
+import path from 'node:path'
+import { load } from 'js-yaml'
 import { config } from '../config.js'
+import {
+  findFeatureControlByName,
+  upsertFeatureControl
+} from '../repository/feature-control-repository.js'
 
 const controlsDirectory = 'feature-controls'
 
-export const informBrokerOfFeatureControls = async (logger) => {
-  const configsAtServiceVersion = constructConfigsAtServiceVersion()
+export const informBrokerOfFeatureControls = async (server) => {
+  const { db, logger } = server
 
-  if (await configAlreadyPublished(configsAtServiceVersion, logger)) {
-    return // exit early, broker already published config
+  const files = readdirSync(controlsDirectory).filter((file) =>
+    file.endsWith('.yml')
+  )
+
+  for (const file of files) {
+    try {
+      const filePath = path.join(controlsDirectory, file)
+      const fileContent = readFileSync(filePath, 'utf8')
+      const yamlData = load(fileContent)
+
+      const featureControl = {
+        name: yamlData.name.toUpperCase(),
+        type: yamlData.type,
+        description: yamlData.description,
+        scopes: yamlData.scopes,
+        owner: yamlData.owner,
+        expiryDate: new Date(yamlData.expiryDate).toISOString(),
+        createdBy: config.get('serviceDeployer'),
+        initialValue: transformInitialValue(yamlData.initial_value)
+      }
+
+      if (yamlData.roleRequired) {
+        featureControl.roleRequired = yamlData.roleRequired
+      }
+
+      const existing = await findFeatureControlByName(db, featureControl.name)
+
+      let shouldProceed = false
+      if (!existing) {
+        shouldProceed = true
+      } else {
+        // Remove MongoDB internal fields for comparison
+        const { _id, ...existingData } = existing
+        // Compare data. We use stringify for a simple deep comparison of plain objects
+        if (JSON.stringify(existingData) !== JSON.stringify(featureControl)) {
+          shouldProceed = true
+        }
+      }
+
+      if (shouldProceed) {
+        logger.info(`Updating feature control: ${featureControl.name}`)
+        await upsertFeatureControl(db, featureControl)
+
+        await sendToBroker(featureControl, logger)
+      } else {
+        logger.info(
+          `Feature control ${featureControl.name} is up to date, will not inform config-broker`
+        )
+      }
+    } catch (err) {
+      logger.error(`Failed to process feature control file ${file}:`, err)
+    }
   }
-
-  // await storeConfigAtServiceVersion(configsAtServiceVersion, logger);
-  //
-  // await notifyConfigBrokerServiceVersionAvailable(
-  //   configsAtServiceVersion,
-  //   logger,
-  // );
 }
 
-const constructConfigsAtServiceVersion = () => {
-  const version = config.get('serviceVersion')
-
-  //we may still want to use this version to store with metadata in mongo to decide on whether we want to emit message to config-broker
-
-  // all top-level directories are considered separate grant configurations
-  // const configDirs = readdirSync(controlsDirectory, { withFileTypes: true })
-  //   .filter((dirent) => dirent.isDirectory())
-  //   .map((dirent) => dirent.name);
-  //
-  // // iterate each grant configuration, collecting: grant, version and files
-  // return configDirs.map((grant) => {
-  //   const files = readdirSync(`${controlsDirectory}/${grant}`, {
-  //     withFileTypes: true,
-  //     recursive: true,
-  //   })
-  //     .filter((dirent) => dirent.isFile())
-  //     .map((dirent) => {
-  //       const configPath = `${controlsDirectory}/${grant}`;
-  //
-  //       const direntWithoutConfigPath = dirent.parentPath
-  //         ? `${dirent.parentPath.replace(configPath, "")}/${dirent.name}`
-  //         : `${dirent.name}`;
-  //
-  //       const localPath = `${configPath}${direntWithoutConfigPath}`;
-  //       const s3Path = `${grant}/${version}${direntWithoutConfigPath}`;
-  //       return [localPath, s3Path];
-  //     });
-  //
-  //   return { grant, version, files };
-  // });
+const transformInitialValue = (initialValueArray) => {
+  if (!Array.isArray(initialValueArray)) return initialValueArray
+  const obj = {}
+  initialValueArray.forEach((item) => {
+    obj[item.name] = item.value
+  })
+  return obj
 }
 
-const configAlreadyPublished = async (configsAtServiceVersion, logger) => {
-  // using the config-store-and-inform service as an inspiration, check MongoDB for existing configs
-  // for (const { grant, version } of configsAtServiceVersion) {
-  //   const files = await listFiles(logger, `${grant}/${version}/metadata.json`);
-  //   if (files.length > 0) {
-  //     logger.warn(
-  //       `grant config '${grant}' at version '${version}' already published, not safe to store`,
-  //     );
-  //     return true;
-  //   }
-  // }
-  return false
-}
+const sendToBroker = async (payload, logger) => {
+  const baseUrl = config.get('configBroker.baseUrl')
+  // The schema location suggested /api/feature-control or similar
+  // Based on the prompt's context of config broker and feature-control-schemas.js
+  const url = new URL('/api/feature-control', baseUrl)
 
-const sendConfigMessageToBroker = async (
-  configBrokerEndpoint,
-  configAtServiceVersion,
-  configPublishStatus,
-  logger
-) => {
-  const { grant, version, files } = configAtServiceVersion
-  // files is an array of tuples, we only want the S3 paths here
-  const s3Paths = files.map(([_, s3Path]) => s3Path)
-
-  // When CDP is updated to inject user that did deployment of container, reference that injected variable from config here
-  const user = 'system'
-
-  const payload = {
-    grant,
-    version,
-    files: s3Paths,
-    status: configPublishStatus,
-    user
-  }
-
-  const url = new URL(`/api/release-config`, configBrokerEndpoint)
   try {
     const response = await fetch(url.href, {
       method: 'POST',
       headers: {
-        // ...createApiHeadersForConfigBroker(),
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(payload)
@@ -99,14 +93,18 @@ const sendConfigMessageToBroker = async (
 
     if (response.ok) {
       logger.info(
-        `successfully notified the config broker about '${grant}' at version '${version}'`
+        `Successfully notified the config broker about feature control '${payload.name}'`
       )
     } else {
+      const responseText = await response.text()
       logger.error(
-        `call to release config failed with status '${response.status}' and text '${response.statusText}'`
+        `Failed to notify the config broker about feature control '${payload.name}'. Status: ${response.status}. Error: ${responseText}`
       )
     }
   } catch (err) {
-    logger.error('call to release config failed', err)
+    logger.error(
+      `Error notifying the config broker about feature control '${payload.name}':`,
+      err
+    )
   }
 }

@@ -11,7 +11,7 @@ export async function startServer() {
     `Access your backend on http://localhost:${config.get('port')}`
   )
 
-  await informBrokerOfFeatureControls(server.logger.child({}))
+  await informBrokerOfFeatureControls(server)
 
   return server
 }
