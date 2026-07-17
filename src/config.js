@@ -122,10 +122,10 @@ export const config = convict({
   },
   configBroker: {
     baseUrl: {
-      doc: 'The base URL for the config broker',
+      doc: 'The API URL for the config broker',
       format: 'url',
       default: 'http://localhost:3002',
-      env: 'CONFIG_BROWSER_BASE_URL'
+      env: 'CONFIG_BROKER_API_URL'
     }
   },
   serviceDeployer: {

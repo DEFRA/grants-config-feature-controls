@@ -160,10 +160,8 @@ describe('informBrokerOfFeatureControls', () => {
     await informBrokerOfFeatureControls(mockServer)
 
     expect(mockLogger.error).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'Failed to process feature control file test.yml'
-      ),
-      expect.any(Error)
+      expect.any(Error),
+      expect.stringContaining('Failed to process feature control file test.yml')
     )
   })
 
@@ -213,10 +211,10 @@ describe('informBrokerOfFeatureControls', () => {
     await informBrokerOfFeatureControls(mockServer)
 
     expect(mockLogger.error).toHaveBeenCalledWith(
+      expect.any(Error),
       expect.stringContaining(
         "Error notifying the config broker about feature control 'TEST':"
-      ),
-      expect.any(Error)
+      )
     )
   })
 
