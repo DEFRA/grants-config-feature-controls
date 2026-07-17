@@ -1,6 +1,7 @@
 import { informBrokerOfFeatureControls } from './feature-control-store-and-inform.js'
 import { readdirSync, readFileSync, existsSync } from 'node:fs'
 import { load } from 'js-yaml'
+import { generateToken } from '#/common/helpers/sts/grants-config-broker-token.js'
 import {
   findFeatureControlByName,
   upsertFeatureControl
@@ -8,6 +9,7 @@ import {
 
 vi.mock('node:fs')
 vi.mock('js-yaml')
+vi.mock('#/common/helpers/sts/grants-config-broker-token.js')
 vi.mock('../repository/feature-control-repository.js')
 global.fetch = vi.fn()
 
@@ -25,8 +27,10 @@ describe('informBrokerOfFeatureControls', () => {
     }
     mockServer = {
       db: mockDb,
-      logger: mockLogger
+      logger: mockLogger,
+      sts: {}
     }
+    generateToken.mockResolvedValue('mock-token')
     vi.clearAllMocks()
   })
 
