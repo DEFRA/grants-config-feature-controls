@@ -1,13 +1,11 @@
 name: Publish
 
-run-name: ${{ github.event.inputs.run_name || github.event.head_commit.message || 'Publish' }}
-
 on:
   push:
     branches:
       - main
     paths:
-      - '../../feature-controls/**'
+      - 'feature-controls/**'
 
 permissions:
   id-token: write
@@ -29,14 +27,22 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Test code and Create Test Coverage Reports
+      - name: Setup Node
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 #7.0.0
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: |
+
+      - name: Test code and Create Test Coverage Reports
+        run: |
           npm ci
           npm test
+
+      - name: Validate feature controls
+        run: |
+          curl -s https://raw.githubusercontent.com/DEFRA/grants-config-broker/main/src/routes/api/feature-control/feature-control-schemas.js -o scripts/feature-control-schemas.temp.js
+          node scripts/validate-feature-controls.js
+          rm scripts/feature-control-schemas.temp.js
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@22918119ff8e1ca75a623e15c8296b6ea4fbe28f #8.2.1
