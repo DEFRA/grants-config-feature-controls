@@ -10,6 +10,7 @@ import { failAction } from '#/common/helpers/fail-action.js'
 import { pulse } from '#/plugins/pulse.js'
 import { requestTracing } from '#/plugins/request-tracing.js'
 import { metrics } from '@defra/cdp-metrics'
+import { awsClients } from '#/common/helpers/aws/aws-clients.js'
 
 export async function createServer() {
   const server = Hapi.server({
@@ -55,7 +56,8 @@ export async function createServer() {
       plugin: mongoDb,
       options: config.get('mongo')
     },
-    router
+    router,
+    awsClients
   ])
 
   return server

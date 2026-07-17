@@ -6,6 +6,7 @@ import {
   findFeatureControlByName,
   upsertFeatureControl
 } from '../repository/feature-control-repository.js'
+import { generateToken } from '#/common/helpers/sts/grants-config-broker-token.js'
 
 const controlsDirectory = 'feature-controls'
 
@@ -43,7 +44,7 @@ export const informBrokerOfFeatureControls = async (server) => {
         logger.info(`Updating feature control: ${featureControl.name}`)
         await upsertFeatureControl(db, featureControl)
 
-        await sendToBroker(featureControl, logger)
+        await sendToBroker(featureControl, logger, server)
       } else {
         logger.info(
           `Feature control ${featureControl.name} is up to date, will not inform config-broker`
@@ -78,16 +79,16 @@ const transformInitialValue = (initialValueArray) => {
   return obj
 }
 
-const sendToBroker = async (payload, logger) => {
-  const baseUrl = config.get('configBroker.baseUrl')
-  // The schema location suggested /api/feature-control or similar
-  // Based on the prompt's context of config broker and feature-control-schemas.js
-  const url = new URL('/api/feature-control', baseUrl)
+const sendToBroker = async (payload, logger, server) => {
+  const apiUrl = config.get('configBroker.apiUrl')
+  const url = new URL(apiUrl)
 
   try {
+    const token = await generateToken(server.sts)
     const response = await fetch(url.href, {
       method: 'POST',
       headers: {
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(payload)

@@ -121,11 +121,25 @@ export const config = convict({
     }
   },
   configBroker: {
-    baseUrl: {
+    apiUrl: {
       doc: 'The API URL for the config broker',
       format: 'url',
       default: 'http://localhost:3002',
       env: 'CONFIG_BROKER_API_URL'
+    },
+    serviceAuth: {
+      audience: {
+        doc: 'JWT audience sent in the token request',
+        format: String,
+        default: 'grants-config-broker',
+        env: 'BACKEND_SERVICE_AUTH_AUDIENCE'
+      },
+      tokenDuration: {
+        doc: 'Token lifetime in seconds (max 900)',
+        format: Number,
+        default: 60,
+        env: 'BACKEND_SERVICE_AUTH_TOKEN_DURATION'
+      }
     }
   },
   serviceDeployer: {
