@@ -14,5 +14,5 @@ initial_value:
   - name: dev
     value:
       - value1
-      - value2
+      - "value2"
       - "value 3 the special one"

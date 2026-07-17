@@ -50,7 +50,7 @@ export const informBrokerOfFeatureControls = async (server) => {
         )
       }
     } catch (err) {
-      logger.error(`Failed to process feature control file ${file}:`, err)
+      logger.error(err, `Failed to process feature control file ${file}:`)
     }
   }
 }
@@ -105,8 +105,8 @@ const sendToBroker = async (payload, logger) => {
     }
   } catch (err) {
     logger.error(
-      `Error notifying the config broker about feature control '${payload.name}':`,
-      err
+      err,
+      `Error notifying the config broker about feature control '${payload.name}':`
     )
   }
 }
