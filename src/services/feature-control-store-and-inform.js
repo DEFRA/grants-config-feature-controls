@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync, existsSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 import path from 'node:path'
 import { load } from 'js-yaml'
 import { config } from '../config.js'
@@ -37,19 +37,7 @@ export const informBrokerOfFeatureControls = async (server) => {
         featureControl.roleRequired = yamlData.roleRequired
       }
 
-      const existing = await findFeatureControlByName(db, featureControl.name)
-
-      let shouldProceed = false
-      if (!existing) {
-        shouldProceed = true
-      } else {
-        // Remove MongoDB internal fields for comparison
-        const { _id, ...existingData } = existing
-        // Compare data. We use stringify for a simple deep comparison of plain objects
-        if (JSON.stringify(existingData) !== JSON.stringify(featureControl)) {
-          shouldProceed = true
-        }
-      }
+      const shouldProceed = await checkIfNewOrUpdated(db, featureControl)
 
       if (shouldProceed) {
         logger.info(`Updating feature control: ${featureControl.name}`)
@@ -67,8 +55,22 @@ export const informBrokerOfFeatureControls = async (server) => {
   }
 }
 
+const checkIfNewOrUpdated = async (db, featureControl) => {
+  const existing = await findFeatureControlByName(db, featureControl.name)
+  if (!existing) {
+    return true
+  } else {
+    // Remove MongoDB internal fields for comparison
+    const { _id, ...existingData } = existing
+    // Compare data. We use stringify for a simple deep comparison of plain objects
+    if (JSON.stringify(existingData) !== JSON.stringify(featureControl)) {
+      return true
+    }
+  }
+  return false
+}
+
 const transformInitialValue = (initialValueArray) => {
-  if (!Array.isArray(initialValueArray)) return initialValueArray
   const obj = {}
   initialValueArray.forEach((item) => {
     obj[item.name] = item.value
