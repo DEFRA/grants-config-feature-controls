@@ -9,10 +9,10 @@ expiryDate: 2027-01-01
 initial_value:
   - name: default
     value:
-      - value1
-      - value2
+      - "value1"
+      - "value2"
   - name: dev
     value:
-      - value1
+      - "value1"
       - "value2"
       - "value 3 the special one"
