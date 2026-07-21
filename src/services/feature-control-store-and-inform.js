@@ -1,5 +1,6 @@
 import { readFileSync, readdirSync } from 'node:fs'
 import path from 'node:path'
+import { isDeepStrictEqual } from 'node:util'
 import { load } from 'js-yaml'
 import { config } from '../config.js'
 import {
@@ -64,7 +65,7 @@ const checkIfNewOrUpdated = async (db, featureControl) => {
     // Remove MongoDB internal fields for comparison
     const { _id, ...existingData } = existing
     // Compare data. We use stringify for a simple deep comparison of plain objects
-    if (JSON.stringify(existingData) !== JSON.stringify(featureControl)) {
+    if (!isDeepStrictEqual(existingData, featureControl)) {
       return true
     }
   }
