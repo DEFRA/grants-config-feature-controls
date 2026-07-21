@@ -1,0 +1,15 @@
+---
+name: ACTION_UPL8_ENABLED
+type: boolean
+description: Controls whether the UPL8 action is enabled
+scopes:
+  - service.grants-ui
+owner: Grants Framework
+expiryDate: 2030-01-01
+initial_value:
+  - name: default
+    value: false
+  - name: test
+    value: true
+  - name: ext-test
+    value: true
