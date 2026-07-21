@@ -93,6 +93,41 @@ describe('informBrokerOfFeatureControls', () => {
     )
   })
 
+  test('should not notify broker if no change and fields are in different order', async () => {
+    existsSync.mockReturnValue(true)
+    readdirSync.mockReturnValue(['test.yml'])
+    readFileSync.mockReturnValue('content')
+    const data = {
+      // fields in different order than mock returned from db
+      initialValue: { default: true },
+      name: 'TEST',
+      type: 'boolean',
+      description: 'desc',
+      scopes: ['scope'],
+      owner: 'owner',
+      expiryDate: new Date('2027-01-01').toISOString(),
+      createdBy: 'system'
+    }
+    load.mockReturnValue({
+      name: 'TEST',
+      type: 'boolean',
+      description: 'desc',
+      scopes: ['scope'],
+      owner: 'owner',
+      expiryDate: '2027-01-01',
+      initial_value: [{ name: 'default', value: true }]
+    })
+    findFeatureControlByName.mockResolvedValue(data)
+
+    await informBrokerOfFeatureControls(mockServer)
+
+    expect(upsertFeatureControl).not.toHaveBeenCalled()
+    expect(fetch).not.toHaveBeenCalled()
+    expect(mockLogger.info).toHaveBeenCalledWith(
+      expect.stringContaining('up to date')
+    )
+  })
+
   test('should notify broker if existing feature control has changed', async () => {
     existsSync.mockReturnValue(true)
     readdirSync.mockReturnValue(['test.yml'])
