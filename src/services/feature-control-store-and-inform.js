@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { isDeepStrictEqual } from 'node:util'
 import { load } from 'js-yaml'
@@ -24,6 +24,9 @@ export const informBrokerOfFeatureControls = async (server) => {
       const fileContent = readFileSync(filePath, 'utf8')
       const yamlData = load(fileContent)
 
+      const shouldSendToBroker =
+        yamlData.environments?.includes(config.get('cdpEnvironment')) ?? true
+
       const featureControl = {
         name: yamlData.name.toUpperCase(),
         type: yamlData.type,
@@ -48,7 +51,9 @@ export const informBrokerOfFeatureControls = async (server) => {
         logger.info(`Updating feature control: ${featureControl.name}`)
         await upsertFeatureControl(db, featureControl)
 
-        await sendToBroker(featureControl, logger, server)
+        if (shouldSendToBroker) {
+          await sendToBroker(featureControl, logger, server)
+        }
       } else {
         logger.info(
           `Feature control ${featureControl.name} is up to date, will not inform config-broker`
