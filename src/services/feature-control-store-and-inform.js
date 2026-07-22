@@ -19,49 +19,55 @@ export const informBrokerOfFeatureControls = async (server) => {
   )
 
   for (const file of files) {
-    try {
-      const filePath = path.join(controlsDirectory, file)
-      const fileContent = readFileSync(filePath, 'utf8')
-      const yamlData = load(fileContent)
+    await processFeatureControlFile(file, server)
+  }
+}
 
-      const shouldSendToBroker =
-        yamlData.environments?.includes(config.get('cdpEnvironment')) ?? true
+const processFeatureControlFile = async (file, server) => {
+  const { db, logger } = server
 
-      const featureControl = {
-        name: yamlData.name.toUpperCase(),
-        type: yamlData.type,
-        description: yamlData.description,
-        scopes: yamlData.scopes,
-        owner: yamlData.owner,
-        expiryDate: new Date(yamlData.expiryDate).toISOString(),
-        createdBy: config.get('serviceDeployer'),
-        initialValue: transformInitialValue(yamlData.initial_value)
-      }
+  try {
+    const filePath = path.join(controlsDirectory, file)
+    const fileContent = readFileSync(filePath, 'utf8')
+    const yamlData = load(fileContent)
 
-      if (yamlData.roleRequired) {
-        featureControl.roleRequired = yamlData.roleRequired
-      }
-      if (yamlData.environments) {
-        featureControl.environments = yamlData.environments
-      }
+    const shouldSendToBroker =
+      yamlData.environments?.includes(config.get('cdpEnvironment')) ?? true
 
-      const shouldProceed = await checkIfNewOrUpdated(db, featureControl)
-
-      if (shouldProceed) {
-        logger.info(`Updating feature control: ${featureControl.name}`)
-        await upsertFeatureControl(db, featureControl)
-
-        if (shouldSendToBroker) {
-          await sendToBroker(featureControl, logger, server)
-        }
-      } else {
-        logger.info(
-          `Feature control ${featureControl.name} is up to date, will not inform config-broker`
-        )
-      }
-    } catch (err) {
-      logger.error(err, `Failed to process feature control file ${file}:`)
+    const featureControl = {
+      name: yamlData.name.toUpperCase(),
+      type: yamlData.type,
+      description: yamlData.description,
+      scopes: yamlData.scopes,
+      owner: yamlData.owner,
+      expiryDate: new Date(yamlData.expiryDate).toISOString(),
+      createdBy: config.get('serviceDeployer'),
+      initialValue: transformInitialValue(yamlData.initial_value)
     }
+
+    if (yamlData.roleRequired) {
+      featureControl.roleRequired = yamlData.roleRequired
+    }
+    if (yamlData.environments) {
+      featureControl.environments = yamlData.environments
+    }
+
+    const shouldProceed = await checkIfNewOrUpdated(db, featureControl)
+
+    if (shouldProceed) {
+      logger.info(`Updating feature control: ${featureControl.name}`)
+      await upsertFeatureControl(db, featureControl)
+
+      if (shouldSendToBroker) {
+        await sendToBroker(featureControl, logger, server)
+      }
+    } else {
+      logger.info(
+        `Feature control ${featureControl.name} is up to date, will not inform config-broker`
+      )
+    }
+  } catch (err) {
+    logger.error(err, `Failed to process feature control file ${file}:`)
   }
 }
 
@@ -69,15 +75,12 @@ const checkIfNewOrUpdated = async (db, featureControl) => {
   const existing = await findFeatureControlByName(db, featureControl.name)
   if (!existing) {
     return true
-  } else {
-    // Remove MongoDB internal fields for comparison
-    const { _id, ...existingData } = existing
-    // Compare data. We use stringify for a simple deep comparison of plain objects
-    if (!isDeepStrictEqual(existingData, featureControl)) {
-      return true
-    }
   }
-  return false
+
+  // Remove MongoDB internal fields for comparison
+  const { _id, ...existingData } = existing
+  // Compare data. We use stringify for a simple deep comparison of plain objects
+  return !isDeepStrictEqual(existingData, featureControl)
 }
 
 const transformInitialValue = (initialValueArray) => {
