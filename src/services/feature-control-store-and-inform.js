@@ -38,6 +38,9 @@ export const informBrokerOfFeatureControls = async (server) => {
       if (yamlData.roleRequired) {
         featureControl.roleRequired = yamlData.roleRequired
       }
+      if (yamlData.environments) {
+        featureControl.environments = yamlData.environments
+      }
 
       const shouldProceed = await checkIfNewOrUpdated(db, featureControl)
 

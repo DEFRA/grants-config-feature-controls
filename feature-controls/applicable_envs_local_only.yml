@@ -1,0 +1,13 @@
+---
+name: TEST_APPLICABLE_ENVS_LOCAL_ONLY
+type: boolean
+description: test feature control only created locally, but should be stored in the datastore
+scopes:
+  - service.config-management
+owner: Grants Framework
+expiryDate: 2030-01-01
+initial_value:
+  - name: default
+    value: false
+environments:
+  - local
