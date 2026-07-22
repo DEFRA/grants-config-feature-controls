@@ -287,4 +287,55 @@ describe('informBrokerOfFeatureControls', () => {
       })
     )
   })
+
+  test('should store control but not notify broker when current env is not in environments', async () => {
+    existsSync.mockReturnValue(true)
+    readdirSync.mockReturnValue(['test.yml'])
+    readFileSync.mockReturnValue('content')
+    load.mockReturnValue({
+      name: 'TEST',
+      type: 'boolean',
+      description: 'desc',
+      scopes: ['scope'],
+      environments: ['prod'],
+      owner: 'owner',
+      expiryDate: '2027-01-01',
+      initial_value: [{ name: 'default', value: true }]
+    })
+    findFeatureControlByName.mockResolvedValue(null)
+
+    await informBrokerOfFeatureControls(mockServer)
+
+    expect(upsertFeatureControl).toHaveBeenCalledWith(
+      mockDb,
+      expect.objectContaining({ name: 'TEST' })
+    )
+    expect(fetch).not.toHaveBeenCalled()
+  })
+
+  test('should store control and notify broker when current env is in environments', async () => {
+    existsSync.mockReturnValue(true)
+    readdirSync.mockReturnValue(['test.yml'])
+    readFileSync.mockReturnValue('content')
+    load.mockReturnValue({
+      name: 'TEST',
+      type: 'boolean',
+      description: 'desc',
+      scopes: ['scope'],
+      environments: ['local', 'dev', 'test', 'perf-test', 'ext-test', 'prod'],
+      owner: 'owner',
+      expiryDate: '2027-01-01',
+      initial_value: [{ name: 'default', value: true }]
+    })
+    findFeatureControlByName.mockResolvedValue(null)
+    fetch.mockResolvedValue({ ok: true })
+
+    await informBrokerOfFeatureControls(mockServer)
+
+    expect(upsertFeatureControl).toHaveBeenCalledWith(
+      mockDb,
+      expect.objectContaining({ name: 'TEST' })
+    )
+    expect(fetch).toHaveBeenCalled()
+  })
 })

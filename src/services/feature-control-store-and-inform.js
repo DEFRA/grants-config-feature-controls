@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { isDeepStrictEqual } from 'node:util'
 import { load } from 'js-yaml'
@@ -12,51 +12,60 @@ import { generateToken } from '#/common/helpers/sts/grants-config-broker-token.j
 const controlsDirectory = 'feature-controls'
 
 export const informBrokerOfFeatureControls = async (server) => {
-  const { db, logger } = server
-
   const files = readdirSync(controlsDirectory).filter((file) =>
     file.endsWith('.yml')
   )
 
   for (const file of files) {
-    try {
-      const filePath = path.join(controlsDirectory, file)
-      const fileContent = readFileSync(filePath, 'utf8')
-      const yamlData = load(fileContent)
+    await processFeatureControlFile(file, server)
+  }
+}
 
-      const featureControl = {
-        name: yamlData.name.toUpperCase(),
-        type: yamlData.type,
-        description: yamlData.description,
-        scopes: yamlData.scopes,
-        owner: yamlData.owner,
-        expiryDate: new Date(yamlData.expiryDate).toISOString(),
-        createdBy: config.get('serviceDeployer'),
-        initialValue: transformInitialValue(yamlData.initial_value)
-      }
+const processFeatureControlFile = async (file, server) => {
+  const { db, logger } = server
 
-      if (yamlData.roleRequired) {
-        featureControl.roleRequired = yamlData.roleRequired
-      }
-      if (yamlData.environments) {
-        featureControl.environments = yamlData.environments
-      }
+  try {
+    const filePath = path.join(controlsDirectory, file)
+    const fileContent = readFileSync(filePath, 'utf8')
+    const yamlData = load(fileContent)
 
-      const shouldProceed = await checkIfNewOrUpdated(db, featureControl)
+    const shouldSendToBroker =
+      yamlData.environments?.includes(config.get('cdpEnvironment')) ?? true
 
-      if (shouldProceed) {
-        logger.info(`Updating feature control: ${featureControl.name}`)
-        await upsertFeatureControl(db, featureControl)
-
-        await sendToBroker(featureControl, logger, server)
-      } else {
-        logger.info(
-          `Feature control ${featureControl.name} is up to date, will not inform config-broker`
-        )
-      }
-    } catch (err) {
-      logger.error(err, `Failed to process feature control file ${file}:`)
+    const featureControl = {
+      name: yamlData.name.toUpperCase(),
+      type: yamlData.type,
+      description: yamlData.description,
+      scopes: yamlData.scopes,
+      owner: yamlData.owner,
+      expiryDate: new Date(yamlData.expiryDate).toISOString(),
+      createdBy: config.get('serviceDeployer'),
+      initialValue: transformInitialValue(yamlData.initial_value)
     }
+
+    if (yamlData.roleRequired) {
+      featureControl.roleRequired = yamlData.roleRequired
+    }
+    if (yamlData.environments) {
+      featureControl.environments = yamlData.environments
+    }
+
+    const shouldProceed = await checkIfNewOrUpdated(db, featureControl)
+
+    if (shouldProceed) {
+      logger.info(`Updating feature control: ${featureControl.name}`)
+      await upsertFeatureControl(db, featureControl)
+
+      if (shouldSendToBroker) {
+        await sendToBroker(featureControl, logger, server)
+      }
+    } else {
+      logger.info(
+        `Feature control ${featureControl.name} is up to date, will not inform config-broker`
+      )
+    }
+  } catch (err) {
+    logger.error(err, `Failed to process feature control file ${file}:`)
   }
 }
 
@@ -64,15 +73,12 @@ const checkIfNewOrUpdated = async (db, featureControl) => {
   const existing = await findFeatureControlByName(db, featureControl.name)
   if (!existing) {
     return true
-  } else {
-    // Remove MongoDB internal fields for comparison
-    const { _id, ...existingData } = existing
-    // Compare data. We use stringify for a simple deep comparison of plain objects
-    if (!isDeepStrictEqual(existingData, featureControl)) {
-      return true
-    }
   }
-  return false
+
+  // remove MongoDB internal fields
+  const { _id, ...existingData } = existing
+
+  return !isDeepStrictEqual(existingData, featureControl)
 }
 
 const transformInitialValue = (initialValueArray) => {
