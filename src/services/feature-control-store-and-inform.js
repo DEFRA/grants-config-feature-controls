@@ -75,9 +75,9 @@ const checkIfNewOrUpdated = async (db, featureControl) => {
     return true
   }
 
-  // Remove MongoDB internal fields for comparison
+  // remove MongoDB internal fields
   const { _id, ...existingData } = existing
-  // Compare data. We use stringify for a simple deep comparison of plain objects
+
   return !isDeepStrictEqual(existingData, featureControl)
 }
 
