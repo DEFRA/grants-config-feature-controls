@@ -12,8 +12,6 @@ import { generateToken } from '#/common/helpers/sts/grants-config-broker-token.j
 const controlsDirectory = 'feature-controls'
 
 export const informBrokerOfFeatureControls = async (server) => {
-  const { db, logger } = server
-
   const files = readdirSync(controlsDirectory).filter((file) =>
     file.endsWith('.yml')
   )
