@@ -6,8 +6,8 @@ scopes:
   - service.grants-ui
 owner: Grants Framework
 expiryDate: 2030-01-01
+environments:
+  - dev
 initial_value:
   - name: dev
     value: false
-environments:
-  - dev
