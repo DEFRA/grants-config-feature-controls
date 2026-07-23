@@ -37,6 +37,7 @@ const validate = () => {
         type: yamlData.type,
         description: yamlData.description,
         scopes: yamlData.scopes,
+        environments: yamlData.environments,
         owner: yamlData.owner,
         expiryDate: yamlData.expiryDate
           ? new Date(yamlData.expiryDate).toISOString()
