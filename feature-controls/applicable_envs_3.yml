@@ -1,0 +1,13 @@
+---
+name: TEST_APPLICABLE_ENVS_3
+type: boolean
+description: test - Control with environments, included dev and initialValue includes dev, expect success
+scopes:
+  - service.grants-ui
+owner: Grants Framework
+expiryDate: 2030-01-01
+initial_value:
+  - name: dev
+    value: false
+environments:
+  - dev

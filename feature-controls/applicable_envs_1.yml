@@ -1,0 +1,11 @@
+---
+name: TEST_APPLICABLE_ENVS_1
+type: boolean
+description: test - Control without environments and initialValue included default, expect success
+scopes:
+  - service.grants-ui
+owner: Grants Framework
+expiryDate: 2030-01-01
+initial_value:
+  - name: default
+    value: false
