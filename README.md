@@ -315,11 +315,8 @@ docker run -e PORT=3001 -p 3001:3001 grants-config-feature-controls
 
 A local environment with:
 
-- Floci for AWS services (S3, SQS, SNS etc)
-- Redis
 - MongoDB
 - This service.
-- A commented out frontend example.
 
 ```bash
 docker compose up --build -d
