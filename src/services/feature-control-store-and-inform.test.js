@@ -1,6 +1,7 @@
 import { informBrokerOfFeatureControls } from './feature-control-store-and-inform.js'
 import { readdirSync, readFileSync, existsSync } from 'node:fs'
 import { load } from 'js-yaml'
+import { config } from '../config.js'
 import { generateToken } from '#/common/helpers/sts/grants-config-broker-token.js'
 import {
   findFeatureControlByName,
@@ -9,6 +10,11 @@ import {
 
 vi.mock('node:fs')
 vi.mock('js-yaml')
+vi.mock('../config.js', () => ({
+  config: {
+    get: vi.fn()
+  }
+}))
 vi.mock('#/common/helpers/sts/grants-config-broker-token.js')
 vi.mock('../repository/feature-control-repository.js')
 global.fetch = vi.fn()
@@ -30,6 +36,15 @@ describe('informBrokerOfFeatureControls', () => {
       logger: mockLogger,
       sts: {}
     }
+    config.get.mockImplementation((key) => {
+      if (key === 'cdpEnvironment') return 'local'
+      if (key === 'serviceDeployer') return 'system'
+      if (key === 'configBroker.apiUrl') {
+        return 'http://localhost:3001/api/feature-control'
+      }
+      if (key === 'configBroker.serviceAuth.enabled') return true
+      return undefined
+    })
     generateToken.mockResolvedValue('mock-token')
     vi.clearAllMocks()
   })
@@ -337,5 +352,43 @@ describe('informBrokerOfFeatureControls', () => {
       expect.objectContaining({ name: 'TEST' })
     )
     expect(fetch).toHaveBeenCalled()
+  })
+
+  test('should use empty token if auth is disabled', async () => {
+    config.get.mockImplementation((key) => {
+      if (key === 'cdpEnvironment') return 'local'
+      if (key === 'serviceDeployer') return 'system'
+      if (key === 'configBroker.apiUrl') {
+        return 'http://localhost:3001/api/feature-control'
+      }
+      if (key === 'configBroker.serviceAuth.enabled') return false
+      return undefined
+    })
+
+    readdirSync.mockReturnValue(['test.yml'])
+    readFileSync.mockReturnValue('content')
+    load.mockReturnValue({
+      name: 'TEST',
+      type: 'boolean',
+      description: 'desc',
+      scopes: ['scope'],
+      owner: 'owner',
+      expiryDate: '2027-01-01',
+      initial_value: [{ name: 'default', value: true }]
+    })
+    findFeatureControlByName.mockResolvedValue(null)
+    fetch.mockResolvedValue({ ok: true })
+
+    await informBrokerOfFeatureControls(mockServer)
+
+    expect(fetch).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: 'Bearer '
+        })
+      })
+    )
+    expect(generateToken).not.toHaveBeenCalled()
   })
 })

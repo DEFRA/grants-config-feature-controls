@@ -91,10 +91,11 @@ const transformInitialValue = (initialValueArray) => {
 
 const sendToBroker = async (payload, logger, server) => {
   const apiUrl = config.get('configBroker.apiUrl')
+  const authEnabled = config.get('configBroker.serviceAuth.enabled')
   const url = new URL(apiUrl)
 
   try {
-    const token = await generateToken(server.sts)
+    const token = authEnabled ? await generateToken(server.sts) : ''
     const response = await fetch(url.href, {
       method: 'POST',
       headers: {

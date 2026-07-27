@@ -124,7 +124,7 @@ export const config = convict({
     apiUrl: {
       doc: 'The API URL for the config broker',
       format: 'url',
-      default: 'http://localhost:3002',
+      default: 'http://localhost:3001/api/feature-control',
       env: 'CONFIG_BROKER_API_URL'
     },
     serviceAuth: {
@@ -139,6 +139,12 @@ export const config = convict({
         format: Number,
         default: 60,
         env: 'BACKEND_SERVICE_AUTH_TOKEN_DURATION'
+      },
+      enabled: {
+        doc: 'Whether the service auth is enabled',
+        format: Boolean,
+        default: isProduction,
+        env: 'BACKEND_SERVICE_AUTH_ENABLED'
       }
     }
   },
