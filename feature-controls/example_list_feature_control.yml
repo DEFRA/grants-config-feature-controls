@@ -19,3 +19,4 @@ initial_value:
 roleRequired:
   - "role1"
   - "role2"
+  - "role3"
