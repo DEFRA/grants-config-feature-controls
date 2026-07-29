@@ -19,3 +19,6 @@ initial_value:
 roleRequired:
   - "role1"
   - "role2"
+environments:
+  - dev
+  - test
