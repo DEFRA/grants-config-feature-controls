@@ -7,7 +7,7 @@ import {
   findFeatureControlByName,
   upsertFeatureControl
 } from '../repository/feature-control-repository.js'
-import { generateToken } from '#/common/helpers/sts/grants-config-broker-token.js'
+import { createAuthenticatedHeaders } from '@defra/grants-config-utils/broker'
 
 const controlsDirectory = 'feature-controls'
 
@@ -95,13 +95,15 @@ const sendToBroker = async (payload, logger, server) => {
   const url = new URL(apiUrl)
 
   try {
-    const token = authEnabled ? await generateToken(server.sts) : ''
+    let headers = {
+      'Content-Type': 'application/json'
+    }
+    if (authEnabled) {
+      headers = createAuthenticatedHeaders(server, headers)
+    }
     const response = await fetch(url.href, {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
+      headers,
       body: JSON.stringify(payload)
     })
 

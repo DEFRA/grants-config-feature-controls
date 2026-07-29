@@ -128,18 +128,6 @@ export const config = convict({
       env: 'CONFIG_BROKER_API_URL'
     },
     serviceAuth: {
-      audience: {
-        doc: 'JWT audience sent in the token request',
-        format: String,
-        default: 'grants-config-broker',
-        env: 'BACKEND_SERVICE_AUTH_AUDIENCE'
-      },
-      tokenDuration: {
-        doc: 'Token lifetime in seconds (max 900)',
-        format: Number,
-        default: 60,
-        env: 'BACKEND_SERVICE_AUTH_TOKEN_DURATION'
-      },
       enabled: {
         doc: 'Whether the service auth is enabled',
         format: Boolean,

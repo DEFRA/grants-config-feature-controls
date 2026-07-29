@@ -10,7 +10,7 @@ import { failAction } from '#/common/helpers/fail-action.js'
 import { pulse } from '#/plugins/pulse.js'
 import { requestTracing } from '#/plugins/request-tracing.js'
 import { metrics } from '@defra/cdp-metrics'
-import { awsClients } from '#/common/helpers/aws/aws-clients.js'
+import { stsClientPlugin } from '@defra/grants-config-utils/sts-client-plugin'
 
 export async function createServer() {
   const server = Hapi.server({
@@ -57,7 +57,7 @@ export async function createServer() {
       options: config.get('mongo')
     },
     router,
-    awsClients
+    stsClientPlugin
   ])
 
   return server

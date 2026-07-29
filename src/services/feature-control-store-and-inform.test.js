@@ -2,11 +2,11 @@ import { informBrokerOfFeatureControls } from './feature-control-store-and-infor
 import { readdirSync, readFileSync, existsSync } from 'node:fs'
 import { load } from 'js-yaml'
 import { config } from '../config.js'
-import { generateToken } from '#/common/helpers/sts/grants-config-broker-token.js'
 import {
   findFeatureControlByName,
   upsertFeatureControl
 } from '../repository/feature-control-repository.js'
+import { createAuthenticatedHeaders } from '@defra/grants-config-utils/broker'
 
 vi.mock('node:fs')
 vi.mock('js-yaml')
@@ -15,7 +15,7 @@ vi.mock('../config.js', () => ({
     get: vi.fn()
   }
 }))
-vi.mock('#/common/helpers/sts/grants-config-broker-token.js')
+vi.mock('@defra/grants-config-utils/broker')
 vi.mock('../repository/feature-control-repository.js')
 global.fetch = vi.fn()
 
@@ -45,7 +45,10 @@ describe('informBrokerOfFeatureControls', () => {
       if (key === 'configBroker.serviceAuth.enabled') return true
       return undefined
     })
-    generateToken.mockResolvedValue('mock-token')
+    createAuthenticatedHeaders.mockImplementation((server, headers) => ({
+      ...headers,
+      Authorization: 'Bearer mock-token'
+    }))
     vi.clearAllMocks()
   })
 
@@ -354,7 +357,7 @@ describe('informBrokerOfFeatureControls', () => {
     expect(fetch).toHaveBeenCalled()
   })
 
-  test('should use empty token if auth is disabled', async () => {
+  test('should not add authentication header if auth is disabled', async () => {
     config.get.mockImplementation((key) => {
       if (key === 'cdpEnvironment') return 'local'
       if (key === 'serviceDeployer') return 'system'
@@ -384,11 +387,11 @@ describe('informBrokerOfFeatureControls', () => {
     expect(fetch).toHaveBeenCalledWith(
       expect.any(String),
       expect.objectContaining({
-        headers: expect.objectContaining({
-          Authorization: 'Bearer '
+        headers: expect.not.objectContaining({
+          Authorization: expect.any(String)
         })
       })
     )
-    expect(generateToken).not.toHaveBeenCalled()
+    expect(createAuthenticatedHeaders).not.toHaveBeenCalled()
   })
 })

@@ -16,3 +16,6 @@ initial_value:
       - "value1"
       - "value2"
       - "value 3 the special one"
+roleRequired:
+  - "role1"
+  - "role2"
