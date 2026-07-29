@@ -99,8 +99,10 @@ const sendToBroker = async (payload, logger, server) => {
       'Content-Type': 'application/json'
     }
     if (authEnabled) {
+      server.logger.info(`Auth enabled for config broker`)
       headers = createAuthenticatedHeaders(server, headers)
     }
+    server.logger.info(`Headers in request: ${JSON.stringify(headers)}`)
     const response = await fetch(url.href, {
       method: 'POST',
       headers,
