@@ -37,7 +37,6 @@ const validate = () => {
         type: yamlData.type,
         description: yamlData.description,
         scopes: yamlData.scopes,
-        environments: yamlData.environments,
         owner: yamlData.owner,
         expiryDate: yamlData.expiryDate
           ? new Date(yamlData.expiryDate).toISOString()
@@ -50,6 +49,9 @@ const validate = () => {
 
       if (yamlData.roleRequired) {
         featureControl.roleRequired = yamlData.roleRequired
+      }
+      if (yamlData.environments) {
+        featureControl.environments = yamlData.environments
       }
 
       const { error } = postAddFeatureControlSchema.validate(featureControl, {
