@@ -7,7 +7,7 @@ import {
   findFeatureControlByName,
   upsertFeatureControl
 } from '../repository/feature-control-repository.js'
-import { createAuthenticatedHeaders } from '../../../grants-config-utils/src/broker/broker-auth-helper.js'
+import { createAuthenticatedHeaders } from '@defra/grants-config-utils/broker'
 
 const controlsDirectory = 'feature-controls'
 

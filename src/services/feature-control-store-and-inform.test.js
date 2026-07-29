@@ -2,11 +2,11 @@ import { informBrokerOfFeatureControls } from './feature-control-store-and-infor
 import { readdirSync, readFileSync, existsSync } from 'node:fs'
 import { load } from 'js-yaml'
 import { config } from '../config.js'
-import { createAuthenticatedHeaders } from '../../../grants-config-utils/src/broker/broker-auth-helper.js'
 import {
   findFeatureControlByName,
   upsertFeatureControl
 } from '../repository/feature-control-repository.js'
+import { createAuthenticatedHeaders } from '@defra/grants-config-utils/broker'
 
 vi.mock('node:fs')
 vi.mock('js-yaml')
@@ -15,7 +15,7 @@ vi.mock('../config.js', () => ({
     get: vi.fn()
   }
 }))
-vi.mock('../../../grants-config-utils/src/broker/broker-auth-helper.js')
+vi.mock('@defra/grants-config-utils/broker')
 vi.mock('../repository/feature-control-repository.js')
 global.fetch = vi.fn()
 
