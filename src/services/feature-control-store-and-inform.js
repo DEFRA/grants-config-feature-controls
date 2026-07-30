@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from 'node:fs'
+import { readdirSync, readFileSync, statSync } from 'node:fs'
 import path from 'node:path'
 import { isDeepStrictEqual } from 'node:util'
 import { load } from 'js-yaml'
@@ -12,34 +12,71 @@ import { createAuthenticatedHeaders } from '@defra/grants-config-utils/broker'
 const controlsDirectory = 'feature-controls'
 
 export const informBrokerOfFeatureControls = async (server) => {
-  const files = readdirSync(controlsDirectory).filter((file) =>
-    file.endsWith('.yml')
-  )
+  const files = getAllYamlFiles(controlsDirectory)
+  const featureControlNames = new Map()
 
-  for (const file of files) {
-    await processFeatureControlFile(file, server)
+  for (const filePath of files) {
+    await processFeatureControlFile(filePath, server, featureControlNames)
+  }
+
+  for (const [name, filePaths] of featureControlNames.entries()) {
+    if (filePaths.length > 1) {
+      server.logger.error(
+        `Duplicate feature control name found: ${name} in files: ${filePaths.join(', ')}`
+      )
+    }
   }
 }
 
-const processFeatureControlFile = async (file, server) => {
+const getAllYamlFiles = (dirPath, arrayOfFiles = []) => {
+  const files = readdirSync(dirPath)
+
+  files.forEach((file) => {
+    const filePath = path.join(dirPath, file)
+    if (statSync(filePath).isDirectory()) {
+      getAllYamlFiles(filePath, arrayOfFiles)
+    } else if (file.endsWith('.yml')) {
+      arrayOfFiles.push(filePath)
+    }
+  })
+
+  return arrayOfFiles
+}
+
+const processFeatureControlFile = async (
+  filePath,
+  server,
+  featureControlNames
+) => {
   const { db, logger } = server
 
   try {
-    const filePath = path.join(controlsDirectory, file)
     const fileContent = readFileSync(filePath, 'utf8')
     const yamlData = load(fileContent)
+
+    if (!yamlData) {
+      logger.warn(`Skipping empty file: ${filePath}`)
+      return
+    }
+
+    const name = yamlData.name.toUpperCase()
+    if (featureControlNames.has(name)) {
+      featureControlNames.get(name).push(filePath)
+    } else {
+      featureControlNames.set(name, [filePath])
+    }
 
     const shouldSendToBroker =
       yamlData.environments?.includes(config.get('cdpEnvironment')) ?? true
 
     const featureControl = {
-      name: yamlData.name.toUpperCase(),
+      name,
       displayName: yamlData.displayName,
       type: yamlData.type,
       description: yamlData.description,
       scopes: yamlData.scopes,
       owner: yamlData.owner,
-      expiryDate: new Date(yamlData.expiryDate).toISOString(),
+      expiryDate: new Date(yamlData.expiryDate),
       createdBy: config.get('serviceDeployer'),
       initialValue: transformInitialValue(yamlData.initial_value)
     }
@@ -66,7 +103,7 @@ const processFeatureControlFile = async (file, server) => {
       )
     }
   } catch (err) {
-    logger.error(err, `Failed to process feature control file ${file}:`)
+    logger.error(err, `Failed to process feature control file ${filePath}:`)
   }
 }
 
