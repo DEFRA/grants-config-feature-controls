@@ -35,7 +35,7 @@ const validate = () => {
       const featureControl = {
         name: yamlData.name ? yamlData.name.toUpperCase() : undefined,
         displayName: yamlData.displayName,
-        status: yamlData.status ? yamlData.status.toLowerCase() : undefined,
+        status: 'active',
         type: yamlData.type,
         description: yamlData.description,
         scopes: yamlData.scopes,

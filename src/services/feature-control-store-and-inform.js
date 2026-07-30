@@ -35,7 +35,7 @@ const processFeatureControlFile = async (file, server) => {
     const featureControl = {
       name: yamlData.name.toUpperCase(),
       displayName: yamlData.displayName,
-      status: yamlData.status.toLowerCase(),
+      status: 'active',
       type: yamlData.type,
       description: yamlData.description,
       scopes: yamlData.scopes,
