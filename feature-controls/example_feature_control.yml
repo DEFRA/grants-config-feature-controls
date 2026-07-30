@@ -1,5 +1,7 @@
 ---
 name: TEST_FEATURE_CONTROL
+displayName: Test Feature Control
+status: active
 type: boolean
 description: test feature control for a toggle type
 scopes:

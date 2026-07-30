@@ -58,6 +58,8 @@ describe('informBrokerOfFeatureControls', () => {
     readFileSync.mockReturnValue('content')
     load.mockReturnValue({
       name: 'TEST',
+      displayName: 'Test Control',
+      status: 'active',
       type: 'boolean',
       description: 'desc',
       scopes: ['scope'],
@@ -83,6 +85,8 @@ describe('informBrokerOfFeatureControls', () => {
     readFileSync.mockReturnValue('content')
     const data = {
       name: 'TEST',
+      displayName: 'Test Control',
+      status: 'active',
       type: 'boolean',
       description: 'desc',
       scopes: ['scope'],
@@ -93,6 +97,8 @@ describe('informBrokerOfFeatureControls', () => {
     }
     load.mockReturnValue({
       name: 'TEST',
+      displayName: 'Test Control',
+      status: 'active',
       type: 'boolean',
       description: 'desc',
       scopes: ['scope'],
@@ -119,6 +125,8 @@ describe('informBrokerOfFeatureControls', () => {
       // fields in different order than mock returned from db
       initialValue: { default: true },
       name: 'TEST',
+      displayName: 'Test Control',
+      status: 'active',
       type: 'boolean',
       description: 'desc',
       scopes: ['scope'],
@@ -128,6 +136,8 @@ describe('informBrokerOfFeatureControls', () => {
     }
     load.mockReturnValue({
       name: 'TEST',
+      displayName: 'Test Control',
+      status: 'active',
       type: 'boolean',
       description: 'desc',
       scopes: ['scope'],
@@ -152,6 +162,8 @@ describe('informBrokerOfFeatureControls', () => {
     readFileSync.mockReturnValue('content')
     const existingData = {
       name: 'TEST',
+      displayName: 'Test Control',
+      status: 'active',
       type: 'boolean',
       description: 'old desc',
       scopes: ['scope'],
@@ -162,6 +174,8 @@ describe('informBrokerOfFeatureControls', () => {
     }
     load.mockReturnValue({
       name: 'TEST',
+      displayName: 'Test Control',
+      status: 'active',
       type: 'boolean',
       description: 'new desc',
       scopes: ['scope'],
@@ -186,6 +200,8 @@ describe('informBrokerOfFeatureControls', () => {
     readFileSync.mockReturnValue('content')
     load.mockReturnValue({
       name: 'TEST',
+      displayName: 'Test Control',
+      status: 'active',
       type: 'boolean',
       description: 'desc',
       scopes: ['scope'],
@@ -227,6 +243,8 @@ describe('informBrokerOfFeatureControls', () => {
     readFileSync.mockReturnValue('content')
     load.mockReturnValue({
       name: 'TEST',
+      displayName: 'Test Control',
+      status: 'active',
       type: 'boolean',
       description: 'desc',
       scopes: ['scope'],
@@ -255,6 +273,8 @@ describe('informBrokerOfFeatureControls', () => {
     readFileSync.mockReturnValue('content')
     load.mockReturnValue({
       name: 'TEST',
+      displayName: 'Test Control',
+      status: 'active',
       type: 'boolean',
       description: 'desc',
       scopes: ['scope'],
@@ -280,6 +300,8 @@ describe('informBrokerOfFeatureControls', () => {
     readFileSync.mockReturnValue('content')
     load.mockReturnValue({
       name: 'TEST',
+      displayName: 'Test Control',
+      status: 'active',
       type: 'object',
       description: 'desc',
       scopes: ['scope'],
@@ -312,6 +334,8 @@ describe('informBrokerOfFeatureControls', () => {
     readFileSync.mockReturnValue('content')
     load.mockReturnValue({
       name: 'TEST',
+      displayName: 'Test Control',
+      status: 'active',
       type: 'boolean',
       description: 'desc',
       scopes: ['scope'],
@@ -337,6 +361,8 @@ describe('informBrokerOfFeatureControls', () => {
     readFileSync.mockReturnValue('content')
     load.mockReturnValue({
       name: 'TEST',
+      displayName: 'Test Control',
+      status: 'active',
       type: 'boolean',
       description: 'desc',
       scopes: ['scope'],
@@ -372,6 +398,8 @@ describe('informBrokerOfFeatureControls', () => {
     readFileSync.mockReturnValue('content')
     load.mockReturnValue({
       name: 'TEST',
+      displayName: 'Test Control',
+      status: 'active',
       type: 'boolean',
       description: 'desc',
       scopes: ['scope'],
