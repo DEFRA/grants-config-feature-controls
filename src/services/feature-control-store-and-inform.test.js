@@ -59,7 +59,6 @@ describe('informBrokerOfFeatureControls', () => {
     load.mockReturnValue({
       name: 'TEST',
       displayName: 'Test Control',
-      status: 'active',
       type: 'boolean',
       description: 'desc',
       scopes: ['scope'],
@@ -86,7 +85,6 @@ describe('informBrokerOfFeatureControls', () => {
     const data = {
       name: 'TEST',
       displayName: 'Test Control',
-      status: 'active',
       type: 'boolean',
       description: 'desc',
       scopes: ['scope'],
@@ -98,7 +96,6 @@ describe('informBrokerOfFeatureControls', () => {
     load.mockReturnValue({
       name: 'TEST',
       displayName: 'Test Control',
-      status: 'active',
       type: 'boolean',
       description: 'desc',
       scopes: ['scope'],
@@ -126,7 +123,6 @@ describe('informBrokerOfFeatureControls', () => {
       initialValue: { default: true },
       name: 'TEST',
       displayName: 'Test Control',
-      status: 'active',
       type: 'boolean',
       description: 'desc',
       scopes: ['scope'],
@@ -137,7 +133,6 @@ describe('informBrokerOfFeatureControls', () => {
     load.mockReturnValue({
       name: 'TEST',
       displayName: 'Test Control',
-      status: 'active',
       type: 'boolean',
       description: 'desc',
       scopes: ['scope'],
@@ -163,7 +158,6 @@ describe('informBrokerOfFeatureControls', () => {
     const existingData = {
       name: 'TEST',
       displayName: 'Test Control',
-      status: 'active',
       type: 'boolean',
       description: 'old desc',
       scopes: ['scope'],
@@ -175,7 +169,6 @@ describe('informBrokerOfFeatureControls', () => {
     load.mockReturnValue({
       name: 'TEST',
       displayName: 'Test Control',
-      status: 'active',
       type: 'boolean',
       description: 'new desc',
       scopes: ['scope'],
@@ -201,7 +194,6 @@ describe('informBrokerOfFeatureControls', () => {
     load.mockReturnValue({
       name: 'TEST',
       displayName: 'Test Control',
-      status: 'active',
       type: 'boolean',
       description: 'desc',
       scopes: ['scope'],
@@ -244,7 +236,6 @@ describe('informBrokerOfFeatureControls', () => {
     load.mockReturnValue({
       name: 'TEST',
       displayName: 'Test Control',
-      status: 'active',
       type: 'boolean',
       description: 'desc',
       scopes: ['scope'],
@@ -274,7 +265,6 @@ describe('informBrokerOfFeatureControls', () => {
     load.mockReturnValue({
       name: 'TEST',
       displayName: 'Test Control',
-      status: 'active',
       type: 'boolean',
       description: 'desc',
       scopes: ['scope'],
@@ -301,7 +291,6 @@ describe('informBrokerOfFeatureControls', () => {
     load.mockReturnValue({
       name: 'TEST',
       displayName: 'Test Control',
-      status: 'active',
       type: 'object',
       description: 'desc',
       scopes: ['scope'],
@@ -335,7 +324,6 @@ describe('informBrokerOfFeatureControls', () => {
     load.mockReturnValue({
       name: 'TEST',
       displayName: 'Test Control',
-      status: 'active',
       type: 'boolean',
       description: 'desc',
       scopes: ['scope'],
@@ -362,7 +350,6 @@ describe('informBrokerOfFeatureControls', () => {
     load.mockReturnValue({
       name: 'TEST',
       displayName: 'Test Control',
-      status: 'active',
       type: 'boolean',
       description: 'desc',
       scopes: ['scope'],
@@ -399,7 +386,6 @@ describe('informBrokerOfFeatureControls', () => {
     load.mockReturnValue({
       name: 'TEST',
       displayName: 'Test Control',
-      status: 'active',
       type: 'boolean',
       description: 'desc',
       scopes: ['scope'],
