@@ -446,4 +446,18 @@ describe('informBrokerOfFeatureControls', () => {
       expect.stringContaining('Duplicate feature control name found: CLASH')
     )
   })
+
+  test('should skip empty yml files and log a warning', async () => {
+    readdirSync.mockReturnValue(['empty.yml'])
+    readFileSync.mockReturnValue('')
+    load.mockReturnValue(null)
+
+    await informBrokerOfFeatureControls(mockServer)
+
+    expect(mockLogger.warn).toHaveBeenCalledWith(
+      expect.stringContaining('Skipping empty file: feature-controls/empty.yml')
+    )
+    expect(upsertFeatureControl).not.toHaveBeenCalled()
+    expect(fetch).not.toHaveBeenCalled()
+  })
 })
