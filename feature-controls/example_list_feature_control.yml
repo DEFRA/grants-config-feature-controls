@@ -1,5 +1,6 @@
 ---
 name: TEST_LIST_CONTROL
+displayName: Test List Control
 type: list-string
 description: test feature control for a list-string type
 scopes:

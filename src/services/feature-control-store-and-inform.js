@@ -71,6 +71,7 @@ const processFeatureControlFile = async (
 
     const featureControl = {
       name,
+      displayName: yamlData.displayName,
       type: yamlData.type,
       description: yamlData.description,
       scopes: yamlData.scopes,
