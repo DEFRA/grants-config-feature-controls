@@ -1,5 +1,5 @@
 import { informBrokerOfFeatureControls } from './feature-control-store-and-inform.js'
-import { readdirSync, readFileSync, existsSync } from 'node:fs'
+import { readdirSync, readFileSync, existsSync, statSync } from 'node:fs'
 import { load } from 'js-yaml'
 import { config } from '../config.js'
 import {
@@ -36,6 +36,7 @@ describe('informBrokerOfFeatureControls', () => {
       logger: mockLogger,
       sts: {}
     }
+    statSync.mockReturnValue({ isDirectory: () => false })
     config.get.mockImplementation((key) => {
       if (key === 'cdpEnvironment') return 'local'
       if (key === 'serviceDeployer') return 'system'
@@ -87,7 +88,7 @@ describe('informBrokerOfFeatureControls', () => {
       description: 'desc',
       scopes: ['scope'],
       owner: 'owner',
-      expiryDate: new Date('2027-01-01').toISOString(),
+      expiryDate: new Date('2027-01-01'),
       createdBy: 'system',
       initialValue: { default: true }
     }
@@ -123,7 +124,7 @@ describe('informBrokerOfFeatureControls', () => {
       description: 'desc',
       scopes: ['scope'],
       owner: 'owner',
-      expiryDate: new Date('2027-01-01').toISOString(),
+      expiryDate: new Date('2027-01-01'),
       createdBy: 'system'
     }
     load.mockReturnValue({
@@ -218,7 +219,9 @@ describe('informBrokerOfFeatureControls', () => {
 
     expect(mockLogger.error).toHaveBeenCalledWith(
       expect.any(Error),
-      expect.stringContaining('Failed to process feature control file test.yml')
+      expect.stringContaining(
+        'Failed to process feature control file feature-controls/test.yml:'
+      )
     )
   })
 
@@ -393,5 +396,54 @@ describe('informBrokerOfFeatureControls', () => {
       })
     )
     expect(createAuthenticatedHeaders).not.toHaveBeenCalled()
+  })
+
+  test('should recursively discover yml files in subdirectories', async () => {
+    readdirSync.mockImplementation((dir) => {
+      if (dir === 'feature-controls') return ['subdir', 'top.yml']
+      if (dir === 'feature-controls/subdir') return ['nested.yml']
+      return []
+    })
+    statSync.mockImplementation((filePath) => ({
+      isDirectory: () => filePath === 'feature-controls/subdir'
+    }))
+    readFileSync.mockReturnValue('content')
+    load.mockReturnValue({
+      name: 'TEST',
+      type: 'boolean',
+      description: 'desc',
+      scopes: ['scope'],
+      owner: 'owner',
+      expiryDate: '2027-01-01',
+      initial_value: [{ name: 'default', value: true }]
+    })
+    findFeatureControlByName.mockResolvedValue(null)
+    fetch.mockResolvedValue({ ok: true })
+
+    await informBrokerOfFeatureControls(mockServer)
+
+    expect(upsertFeatureControl).toHaveBeenCalledTimes(2)
+  })
+
+  test('should log error if duplicate feature control names are found', async () => {
+    readdirSync.mockReturnValue(['file1.yml', 'file2.yml'])
+    readFileSync.mockReturnValue('content')
+    load.mockReturnValue({
+      name: 'CLASH',
+      type: 'boolean',
+      description: 'desc',
+      scopes: ['scope'],
+      owner: 'owner',
+      expiryDate: '2027-01-01',
+      initial_value: [{ name: 'default', value: true }]
+    })
+    findFeatureControlByName.mockResolvedValue(null)
+    fetch.mockResolvedValue({ ok: true })
+
+    await informBrokerOfFeatureControls(mockServer)
+
+    expect(mockLogger.error).toHaveBeenCalledWith(
+      expect.stringContaining('Duplicate feature control name found: CLASH')
+    )
   })
 })
