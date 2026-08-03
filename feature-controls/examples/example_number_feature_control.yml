@@ -1,0 +1,15 @@
+---
+name: NUMBER_FEATURE_CONTROL_EXAMPLE
+displayName: Number Feature Control
+type: number
+description: Example 'number' type feature control
+scopes:
+  - service.config-management
+owner: Grants Framework
+expiryDate: 2030-01-01
+initial_value:
+  - name: default
+    value: 2
+environments:
+  - dev
+  - test

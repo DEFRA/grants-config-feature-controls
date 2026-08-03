@@ -1,0 +1,15 @@
+---
+name: TEXT_FEATURE_CONTROL_EXAMPLE
+displayName: Text Feature Control
+type: string
+description: Example 'string' type feature control
+scopes:
+  - service.config-management
+owner: Grants Framework
+expiryDate: 2030-01-01
+initial_value:
+  - name: default
+    value: 'text value - default'
+environments:
+  - dev
+  - test
