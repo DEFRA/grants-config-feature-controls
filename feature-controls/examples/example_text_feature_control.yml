@@ -1,6 +1,6 @@
 ---
-name: TEXT_FEATURE_CONTROL_EXAMPLE
-displayName: Text Feature Control
+name: EXAMPLE_TEXT
+displayName: Example Control (Text)
 type: string
 description: Example 'string' type feature control
 scopes:

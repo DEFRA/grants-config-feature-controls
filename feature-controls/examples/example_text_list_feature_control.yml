@@ -1,12 +1,12 @@
 ---
-name: TEST_LIST_CONTROL
-displayName: Test List Control
+name: EXAMPLE_TEXT_LIST
+displayName: Example Control (Text List)
 type: list-string
-description: test feature control for a list-string type
+description: Example 'list-string' type feature control
 scopes:
   - service.config-management
 owner: Grants Framework
-expiryDate: 2027-01-01
+expiryDate: 2030-01-01
 initial_value:
   - name: default
     value:
@@ -16,7 +16,7 @@ initial_value:
     value:
       - "value1"
       - "value2"
-      - "value 3 the special one"
+      - "value3 - test env only"
 roleRequired:
   - "role1"
   - "role2"

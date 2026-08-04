@@ -1,12 +1,12 @@
 ---
-name: TEST_FEATURE_CONTROL
-displayName: Test Feature Control
+name: EXAMPLE_TOGGLE
+displayName: Example Control (Toggle)
 type: boolean
-description: test feature control for a toggle type
+description: Example 'boolean' type feature control
 scopes:
   - service.config-management
 owner: Grants Framework
-expiryDate: 2027-01-01
+expiryDate: 2030-01-01
 initial_value:
   - name: default
     value: false
@@ -15,4 +15,3 @@ initial_value:
 environments:
   - dev
   - test
-  - perf-test
