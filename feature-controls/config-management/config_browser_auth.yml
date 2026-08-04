@@ -2,7 +2,7 @@
 name: CONFIG_BROWSER_SERVICE_AUTH_ENABLED
 displayName: Config Browser use service auth
 type: boolean
-description: Switch auth schemes for the config browser
+description: Switch auth schemes (Legacy API key to service auth) for the config browser
 scopes:
   - service.config-browser
 owner: Grants Framework
