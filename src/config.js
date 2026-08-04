@@ -140,7 +140,7 @@ export const config = convict({
     doc: 'The name of the person deploying the service',
     format: String,
     default: 'system',
-    env: 'CDP_SERVICE_DEPLOYED_BY' //This is not confirmed yet as they haven't yet implemented it
+    env: 'SERVICE_DEPLOYED_BY'
   }
 })
 
