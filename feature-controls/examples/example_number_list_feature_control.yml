@@ -1,6 +1,6 @@
 ---
-name: NUMBER_LIST_EXAMPLE
-displayName: Number List Feature Control
+name: EXAMPLE_NUMBER_LIST
+displayName: Example Control (Number List)
 type: list-number
 description: Example 'list-number' type feature control
 scopes:

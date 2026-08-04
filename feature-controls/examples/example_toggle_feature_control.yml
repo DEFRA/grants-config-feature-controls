@@ -1,6 +1,6 @@
 ---
-name: TOGGLE_EXAMPLE
-displayName: Toggle Feature Control
+name: EXAMPLE_TOGGLE
+displayName: Example Control (Toggle)
 type: boolean
 description: Example 'boolean' type feature control
 scopes:

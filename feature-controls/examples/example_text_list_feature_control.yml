@@ -1,6 +1,6 @@
 ---
-name: TEXT_LIST_EXAMPLE
-displayName: Text List Feature Control
+name: EXAMPLE_TEXT_LIST
+displayName: Example Control (Text List)
 type: list-string
 description: Example 'list-string' type feature control
 scopes:

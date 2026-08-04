@@ -1,6 +1,6 @@
 ---
-name: NUMBER_EXAMPLE
-displayName: Number Feature Control
+name: EXAMPLE_NUMBER
+displayName: Example Control (Number)
 type: number
 description: Example 'number' type feature control
 scopes:
