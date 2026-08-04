@@ -1,5 +1,5 @@
 ---
-name: TEXT_FEATURE_CONTROL_EXAMPLE
+name: TEXT_EXAMPLE
 displayName: Text Feature Control
 type: string
 description: Example 'string' type feature control

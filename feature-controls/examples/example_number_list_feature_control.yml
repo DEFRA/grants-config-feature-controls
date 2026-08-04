@@ -1,0 +1,18 @@
+---
+name: NUMBER_LIST_EXAMPLE
+displayName: Number List Feature Control
+type: list-number
+description: Example 'list-number' type feature control
+scopes:
+  - service.config-management
+owner: Grants Framework
+expiryDate: 2030-01-01
+initial_value:
+  - name: default
+    value:
+      - 1
+      - 2
+      - 3
+environments:
+  - dev
+  - test
