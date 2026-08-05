@@ -7,8 +7,6 @@ scopes:
   - grant.grasslands
 owner: Grasslands
 expiryDate: 2050-01-01
-roleRequired:
-  - "grasslands-role"
 environments:
   - dev
   - test
