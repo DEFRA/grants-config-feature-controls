@@ -1,0 +1,37 @@
+---
+name: GRASSLANDS_ACTIONS_BY_ENVIRONMENT
+displayName: Grasslands actions available
+type: list-string
+description: Controls the Grasslands actions available to users.
+scopes:
+  - grant.grasslands
+owner: Grasslands
+expiryDate: 2050-01-01
+environments:
+  - dev
+  - test
+  - perf-test
+  - ext-test
+initial_value:
+  - name: dev
+    value:
+      - "CLIG3"
+      - "CSAM3"
+      - "SCR2"
+  - name: test
+    value:
+      - "CLIG3"
+      - "CSAM3"
+      - "SCR2"
+      - "TEST-ONLY"
+  - name: perf-test
+    value:
+      - "CLIG3"
+      - "CSAM3"
+      - "SCR2"
+  - name: ext-test
+    value:
+      - "CLIG3"
+      - "CSAM3"
+      - "SCR2"
+      - "EXT-TEST-ONLY"
