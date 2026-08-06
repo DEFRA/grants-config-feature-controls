@@ -13,25 +13,21 @@ environments:
   - perf-test
   - ext-test
 initial_value:
-  - name: dev
-    value:
-      - "CLIG3"
-      - "CSAM3"
-      - "SCR2"
-  - name: test
-    value:
-      - "CLIG3"
-      - "CSAM3"
-      - "SCR2"
-      - "TEST-ONLY"
-  - name: perf-test
-    value:
-      - "CLIG3"
-      - "CSAM3"
-      - "SCR2"
-  - name: ext-test
-    value:
-      - "CLIG3"
-      - "CSAM3"
-      - "SCR2"
-      - "EXT-TEST-ONLY"
+  dev:
+    - "CLIG3"
+    - "CSAM3"
+    - "SCR2"
+  test:
+    - "CLIG3"
+    - "CSAM3"
+    - "SCR2"
+    - "TEST-ONLY"
+  perf-test:
+    - "CLIG3"
+    - "CSAM3"
+    - "SCR2"
+  ext-test:
+    - "CLIG3"
+    - "CSAM3"
+    - "SCR2"
+    - "EXT-TEST-ONLY"

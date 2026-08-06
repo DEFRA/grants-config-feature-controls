@@ -8,18 +8,19 @@ scopes:
 owner: Grants Framework
 expiryDate: 2030-01-01
 initial_value:
-  - name: default
-    value:
+  default:
       - "value1"
       - "value2"
-  - name: dev
-    value:
+  dev:
       - "value1"
       - "value2"
       - "dev only"
 roleRequired:
-  - "role1"
-  - "role2"
+  default:
+    - "role1"
+  dev:
+    - "role2"
 environments:
+  - local
   - dev
   - test

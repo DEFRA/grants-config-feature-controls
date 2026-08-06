@@ -1,17 +1,23 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs'
 import path from 'node:path'
 import { load } from 'js-yaml'
-//ignore cannot resolve file message about below line, this will added dynamically by pipeline
+//ignore cannot resolve file message about below line, this will be added dynamically by pipeline
 import { postAddFeatureControlSchema } from './feature-control-schemas.temp.js'
 
 const controlsDirectory = 'feature-controls'
 
-const transformInitialValue = (initialValueArray) => {
-  const obj = {}
-  initialValueArray.forEach((item) => {
-    obj[item.name] = item.value
-  })
-  return obj
+const transformEnvironmentValues = (initialValueArrayOrObject) => {
+  if (Array.isArray(initialValueArrayOrObject)) {
+    const obj = {}
+    initialValueArrayOrObject.forEach((item) => {
+      if (item.name) {
+        obj[item.name] = item.value
+      }
+    })
+    return obj
+  }
+
+  return initialValueArrayOrObject
 }
 
 const getAllYamlFiles = (dirPath, arrayOfFiles = []) => {
@@ -66,12 +72,14 @@ const validate = () => {
           : undefined,
         createdBy: 'system',
         initialValue: yamlData.initial_value
-          ? transformInitialValue(yamlData.initial_value)
+          ? transformEnvironmentValues(yamlData.initial_value)
           : undefined
       }
 
       if (yamlData.roleRequired) {
-        featureControl.roleRequired = yamlData.roleRequired
+        featureControl.roleRequired = transformEnvironmentValues(
+          yamlData.roleRequired
+        )
       }
       if (yamlData.environments) {
         featureControl.environments = yamlData.environments

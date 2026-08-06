@@ -11,5 +11,6 @@ initial_value:
   - name: default
     value: 'text value - default'
 environments:
+  - local
   - dev
   - test
