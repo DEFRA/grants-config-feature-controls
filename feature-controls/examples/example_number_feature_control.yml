@@ -11,5 +11,6 @@ initial_value:
   - name: default
     value: 2
 environments:
+  - local
   - dev
   - test

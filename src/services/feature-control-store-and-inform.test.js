@@ -201,7 +201,10 @@ describe('informBrokerOfFeatureControls', () => {
       owner: 'owner',
       expiryDate: '2027-01-01',
       initial_value: [{ name: 'default', value: true }],
-      roleRequired: 'admin'
+      roleRequired: [
+        { name: 'default', value: ['admin'] },
+        { name: 'test', value: ['test'] }
+      ]
     })
     findFeatureControlByName.mockResolvedValue(null)
     fetch.mockResolvedValue({ ok: true })
@@ -212,7 +215,35 @@ describe('informBrokerOfFeatureControls', () => {
       mockDb,
       expect.objectContaining({
         name: 'TEST',
-        roleRequired: 'admin'
+        roleRequired: { default: ['admin'], test: ['test'] }
+      })
+    )
+  })
+
+  test('should process roleRequired if present in yml in shorthand format', async () => {
+    readdirSync.mockReturnValue(['test.yml'])
+    readFileSync.mockReturnValue('content')
+    load.mockReturnValue({
+      name: 'TEST',
+      displayName: 'Test Control',
+      type: 'boolean',
+      description: 'desc',
+      scopes: ['scope'],
+      owner: 'owner',
+      expiryDate: '2027-01-01',
+      initial_value: [{ name: 'default', value: true }],
+      roleRequired: { default: ['admin'], test: ['test'] }
+    })
+    findFeatureControlByName.mockResolvedValue(null)
+    fetch.mockResolvedValue({ ok: true })
+
+    await informBrokerOfFeatureControls(mockServer)
+
+    expect(upsertFeatureControl).toHaveBeenCalledWith(
+      mockDb,
+      expect.objectContaining({
+        name: 'TEST',
+        roleRequired: { default: ['admin'], test: ['test'] }
       })
     )
   })
@@ -300,8 +331,8 @@ describe('informBrokerOfFeatureControls', () => {
       owner: 'owner',
       expiryDate: '2027-01-01',
       initial_value: [
-        { name: 'item1', value: 'val1' },
-        { name: 'item2', value: 'val2' }
+        { name: 'item1', value: ['val1', 'val2'] },
+        { name: 'item2', value: ['val3'] }
       ]
     })
     findFeatureControlByName.mockResolvedValue(null)
@@ -313,8 +344,40 @@ describe('informBrokerOfFeatureControls', () => {
       mockDb,
       expect.objectContaining({
         initialValue: {
-          item1: 'val1',
-          item2: 'val2'
+          item1: ['val1', 'val2'],
+          item2: ['val3']
+        }
+      })
+    )
+  })
+
+  test('should skip transforming initial_value correctly with multiple items if already in shorthand format', async () => {
+    readdirSync.mockReturnValue(['test.yml'])
+    readFileSync.mockReturnValue('content')
+    load.mockReturnValue({
+      name: 'TEST',
+      displayName: 'Test Control',
+      type: 'object',
+      description: 'desc',
+      scopes: ['scope'],
+      owner: 'owner',
+      expiryDate: '2027-01-01',
+      initial_value: {
+        item1: ['val1', 'val2'],
+        item2: ['val3']
+      }
+    })
+    findFeatureControlByName.mockResolvedValue(null)
+    fetch.mockResolvedValue({ ok: true })
+
+    await informBrokerOfFeatureControls(mockServer)
+
+    expect(upsertFeatureControl).toHaveBeenCalledWith(
+      mockDb,
+      expect.objectContaining({
+        initialValue: {
+          item1: ['val1', 'val2'],
+          item2: ['val3']
         }
       })
     )

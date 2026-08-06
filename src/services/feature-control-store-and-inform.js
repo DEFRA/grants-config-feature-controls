@@ -78,11 +78,13 @@ const processFeatureControlFile = async (
       owner: yamlData.owner,
       expiryDate: new Date(yamlData.expiryDate),
       createdBy: config.get('serviceDeployer'),
-      initialValue: transformInitialValue(yamlData.initial_value)
+      initialValue: transformEnvironmentValues(yamlData.initial_value)
     }
 
     if (yamlData.roleRequired) {
-      featureControl.roleRequired = yamlData.roleRequired
+      featureControl.roleRequired = transformEnvironmentValues(
+        yamlData.roleRequired
+      )
     }
     if (yamlData.environments) {
       featureControl.environments = yamlData.environments
@@ -119,12 +121,18 @@ const checkIfNewOrUpdated = async (db, featureControl) => {
   return !isDeepStrictEqual(existingData, featureControl)
 }
 
-const transformInitialValue = (initialValueArray) => {
-  const obj = {}
-  initialValueArray.forEach((item) => {
-    obj[item.name] = item.value
-  })
-  return obj
+const transformEnvironmentValues = (initialValueArrayOrObject) => {
+  if (Array.isArray(initialValueArrayOrObject)) {
+    const obj = {}
+    initialValueArrayOrObject.forEach((item) => {
+      if (item.name) {
+        obj[item.name] = item.value
+      }
+    })
+    return obj
+  }
+
+  return initialValueArrayOrObject
 }
 
 const sendToBroker = async (payload, logger, server) => {

@@ -13,5 +13,6 @@ initial_value:
   - name: test
     value: true
 environments:
+  - local
   - dev
   - test
