@@ -8,6 +8,9 @@ scopes:
   - service.config-browser
 owner: Grants Framework
 expiryDate: 2050-01-01
+roleRequired:
+  default:
+    - "FGF.Basic"
 initial_value:
   - name: default
     value: false
