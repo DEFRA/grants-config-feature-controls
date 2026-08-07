@@ -1,12 +1,15 @@
 ---
 name: EXAMPLE_TOGGLE
-displayName: Example Control (Toggle)
+displayName: Example Control (Toggle) TEMP
 type: boolean
-description: Example 'boolean' type feature control
+description: Example 'boolean' type feature control TEMP
 scopes:
   - service.config-management
-owner: Grants Framework
-expiryDate: 2030-01-01
+owner: Grants Framework TEMP
+expiryDate: 2050-01-01
+roleRequired:
+  default:
+    - "FGF.Basic"
 initial_value:
   - name: default
     value: false

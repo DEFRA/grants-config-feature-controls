@@ -8,11 +8,14 @@ scopes:
 owner: Grasslands
 expiryDate: 2050-01-01
 environments:
+  - local
   - dev
   - test
   - perf-test
   - ext-test
 initial_value:
+  local:
+    - "FAKE1"
   dev:
     - "CLIG3"
     - "CSAM3"
