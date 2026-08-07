@@ -1,11 +1,12 @@
 ---
 name: EXAMPLE_TOGGLE
-displayName: Example Control (Toggle) TEMP
+displayName: Example Control (Toggle)
 type: boolean
-description: Example 'boolean' type feature control TEMP
+description: Example 'boolean' type feature control
 scopes:
   - service.config-management
-owner: Grants Framework TEMP
+  - service.config-browser
+owner: Grants Framework
 expiryDate: 2050-01-01
 roleRequired:
   default:
