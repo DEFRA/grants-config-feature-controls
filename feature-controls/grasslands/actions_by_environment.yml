@@ -8,6 +8,7 @@ scopes:
 owner: Grasslands
 expiryDate: 2050-01-01
 environments:
+  - local
   - dev
   - test
   - perf-test
