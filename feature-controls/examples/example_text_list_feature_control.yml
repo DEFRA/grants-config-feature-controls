@@ -1,8 +1,8 @@
 ---
 name: EXAMPLE_TEXT_LIST
-displayName: Example Control (Text List)
+displayName: Example Control (Text List) TEMP
 type: list-string
-description: Example 'list-string' type feature control
+description: Example 'list-string' type feature control TEMP
 scopes:
   - service.config-management
 owner: Grants Framework
@@ -19,7 +19,9 @@ roleRequired:
   default:
     - "role1"
   dev:
-    - "role2"
+    - "role3"
+  test:
+    - "role3"
 environments:
   - local
   - dev
