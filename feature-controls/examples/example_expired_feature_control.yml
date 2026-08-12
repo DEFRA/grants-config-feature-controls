@@ -1,0 +1,16 @@
+---
+name: EXAMPLE_EXPIRED
+displayName: Example Control (Expired)
+type: string
+description: Example expired feature control
+scopes:
+  - service.config-management
+owner: Grants Framework
+expiryDate: 2000-01-01
+initial_value:
+  - name: default
+    value: 'expired long ago'
+environments:
+  - local
+  - dev
+  - test
