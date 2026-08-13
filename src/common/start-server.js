@@ -14,7 +14,8 @@ export async function startServer() {
 
   await informBrokerOfFeatureControls(server)
 
-  startFeatureExpiryJob()
+  // don't wait for it to start
+  startFeatureExpiryJob(server)
 
   return server
 }

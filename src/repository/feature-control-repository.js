@@ -13,3 +13,22 @@ export const upsertFeatureControl = async (db, featureControl) => {
       { upsert: true }
     )
 }
+
+export const findNewlyExpiredFeatureControls = async (db) => {
+  return db
+    .collection(FEATURE_CONTROL_COLLECTION_NAME)
+    .find({
+      notifiedExpired: { $ne: true },
+      expiryDate: { $lt: new Date() }
+    })
+    .toArray()
+}
+
+export const setFeatureControlToExpired = async (db, featureControl) => {
+  return db
+    .collection(FEATURE_CONTROL_COLLECTION_NAME)
+    .updateOne(
+      { name: featureControl.name },
+      { $set: { notifiedExpired: true } }
+    )
+}
