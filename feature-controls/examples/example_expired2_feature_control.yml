@@ -6,10 +6,10 @@ description: Example expired feature control, this (and only this) should fail b
 scopes:
   - service.config-management
 owner: Grants Framework
-expiryDate: 2026-08-14
+expiryDate: 2026-08-15
 initial_value:
   - name: default
-    value: 'expired yesterday'
+    value: 'expires in two days'
 environments:
   - local
   - dev
