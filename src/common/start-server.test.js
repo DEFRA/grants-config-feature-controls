@@ -1,7 +1,9 @@
 import hapi from '@hapi/hapi'
 import { informBrokerOfFeatureControls } from '../services/feature-control-store-and-inform.js'
+import { startFeatureExpiryJob } from '../jobs/feature-control-expiry.js'
 
 vi.mock('../services/feature-control-store-and-inform.js')
+vi.mock('../jobs/feature-control-expiry.js')
 describe('#startServer', () => {
   let startServerImport
   let createServerSpy
@@ -36,6 +38,7 @@ describe('#startServer', () => {
 
       expect(createServerSpy).toHaveBeenCalled()
       expect(informBrokerOfFeatureControls).toHaveBeenCalled()
+      expect(startFeatureExpiryJob).toHaveBeenCalled()
     })
   })
 

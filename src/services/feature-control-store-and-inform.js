@@ -7,7 +7,7 @@ import {
   findFeatureControlByName,
   upsertFeatureControl
 } from '../repository/feature-control-repository.js'
-import { createAuthenticatedHeaders } from '@defra/grants-config-utils/broker'
+import { notifyFeatureControlCreatedOrUpdated } from '../api/config-broker-api.js'
 
 const controlsDirectory = 'feature-controls'
 
@@ -97,7 +97,7 @@ const processFeatureControlFile = async (
       await upsertFeatureControl(db, featureControl)
 
       if (shouldSendToBroker) {
-        await sendToBroker(featureControl, logger, server)
+        await notifyFeatureControlCreatedOrUpdated(featureControl, server)
       }
     } else {
       logger.info(
@@ -133,41 +133,4 @@ const transformEnvironmentValues = (initialValueArrayOrObject) => {
   }
 
   return initialValueArrayOrObject
-}
-
-const sendToBroker = async (payload, logger, server) => {
-  const apiUrl = config.get('configBroker.apiUrl')
-  const authEnabled = config.get('configBroker.serviceAuth.enabled')
-  const url = new URL(apiUrl)
-
-  try {
-    let headers = {
-      'Content-Type': 'application/json'
-    }
-    if (authEnabled) {
-      headers = await createAuthenticatedHeaders(server, headers)
-    }
-
-    const response = await fetch(url.href, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(payload)
-    })
-
-    if (response.ok) {
-      logger.info(
-        `Successfully notified the config broker about feature control '${payload.name}'`
-      )
-    } else {
-      const responseText = await response.text()
-      logger.error(
-        `Failed to notify the config broker about feature control '${payload.name}'. Status: ${response.status}. Error: ${responseText}`
-      )
-    }
-  } catch (err) {
-    logger.error(
-      err,
-      `Error notifying the config broker about feature control '${payload.name}':`
-    )
-  }
 }

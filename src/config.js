@@ -141,6 +141,16 @@ export const config = convict({
     format: String,
     default: 'system',
     env: 'SERVICE_DEPLOYED_BY'
+  },
+  jobs: {
+    featureControlExpiry: {
+      schedule: {
+        doc: 'Cron schedule for the feature control expiry job',
+        format: String,
+        default: '0 4 * * 1-5',
+        env: 'FEATURE_CONTROL_EXPIRY_SCHEDULE'
+      }
+    }
   }
 })
 
