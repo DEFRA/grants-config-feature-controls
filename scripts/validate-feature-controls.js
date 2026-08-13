@@ -36,14 +36,14 @@ const getAllYamlFiles = (dirPath, arrayOfFiles = []) => {
 }
 
 const validate = () => {
-  const { filesToValidate, isAllFiles } = getFilesToValidate(
+  const { files, isAllFiles } = getFilesToValidate(
     process.argv.slice(2)
   )
 
   let hasError = false
 
   // Firstly, check that the feature controls are valid against the schema
-  for (const filePath of filesToValidate) {
+  for (const filePath of files) {
     try {
       const fileContent = readFileSync(filePath, 'utf8')
       const yamlData = load(fileContent)
@@ -101,7 +101,7 @@ const validate = () => {
   }
 
   // Then, check for duplicate feature control names
-  const duplicateNames = getDuplicateNames(filesToValidate, isAllFiles)
+  const duplicateNames = getDuplicateNames(files, isAllFiles)
   for (const [name, filePaths] of duplicateNames) {
     console.error(`Duplicate feature control name found: ${name}`)
     filePaths.forEach((filePath) => {
@@ -117,11 +117,11 @@ const validate = () => {
 
 const getFilesToValidate = (args) => {
   if (args.length > 0) {
-    const filesToValidate = args.filter((file) => file.endsWith('.yml'))
-    return { files: filesToValidate, isAllFiles: false }
+    const files = args.filter((file) => file.endsWith('.yml'))
+    return { files, isAllFiles: false }
   } else {
-    const filesToValidate = getAllYamlFiles(controlsDirectory)
-    return { files: filesToValidate, isAllFiles: true }
+    const files = getAllYamlFiles(controlsDirectory)
+    return { files, isAllFiles: true }
   }
 }
 

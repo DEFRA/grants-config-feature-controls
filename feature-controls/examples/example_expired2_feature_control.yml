@@ -1,5 +1,5 @@
 ---
-name: EXAMPLE_EXPIRED2
+name: EXAMPLE_EXPIRED
 displayName: Example Control (Expired2)
 type: string
 description: Example expired feature control, this (and only this) should fail build pipeline
