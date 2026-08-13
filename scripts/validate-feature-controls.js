@@ -40,7 +40,7 @@ const validate = () => {
 
   let hasError = false
 
-  // Firstly, check that the feature controls are valid against the schema
+  // TEMP Firstly, check that the feature controls are valid against the schema
   for (const filePath of files) {
     try {
       const fileContent = readFileSync(filePath, 'utf8')
