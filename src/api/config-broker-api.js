@@ -1,36 +1,6 @@
 import { config } from '../config.js'
 import { createAuthenticatedHeaders } from '@defra/grants-config-utils/broker'
 
-const getHeaders = async (server) => {
-  const authEnabled = config.get('configBroker.serviceAuth.enabled')
-  let headers = {
-    'Content-Type': 'application/json'
-  }
-  if (authEnabled) {
-    headers = await createAuthenticatedHeaders(server, headers)
-  }
-  return headers
-}
-
-const handleResponse = async (
-  response,
-  logger,
-  successMessage,
-  errorMessage
-) => {
-  if (!response) {
-    return
-  }
-  if (response.ok) {
-    logger.info(successMessage)
-  } else {
-    const responseText = await response.text()
-    logger.error(
-      `${errorMessage} Status: ${response.status}. Error: ${responseText}`
-    )
-  }
-}
-
 export const notifyFeatureControlCreatedOrUpdated = async (
   featureControl,
   server
@@ -87,5 +57,35 @@ export const notifyFeatureControlExpired = async (payload, server) => {
       `Error notifying the config broker about feature control '${payload.name}':`
     )
     throw err
+  }
+}
+
+const getHeaders = async (server) => {
+  const authEnabled = config.get('configBroker.serviceAuth.enabled')
+  let headers = {
+    'Content-Type': 'application/json'
+  }
+  if (authEnabled) {
+    headers = await createAuthenticatedHeaders(server, headers)
+  }
+  return headers
+}
+
+const handleResponse = async (
+  response,
+  logger,
+  successMessage,
+  errorMessage
+) => {
+  if (!response) {
+    return
+  }
+  if (response.ok) {
+    logger.info(successMessage)
+  } else {
+    const responseText = await response.text()
+    logger.error(
+      `${errorMessage} Status: ${response.status}. Error: ${responseText}`
+    )
   }
 }
