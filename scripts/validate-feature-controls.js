@@ -36,7 +36,18 @@ const getAllYamlFiles = (dirPath, arrayOfFiles = []) => {
 }
 
 const validate = () => {
-  const files = getAllYamlFiles(controlsDirectory)
+  const args = process.argv.slice(2)
+  let files = []
+
+  if (args.length > 0) {
+    files = args.filter((file) => file.endsWith('.yml'))
+    if (files.length === 0) {
+      console.log('No feature control files to validate.')
+      return
+    }
+  } else {
+    files = getAllYamlFiles(controlsDirectory)
+  }
 
   let hasError = false
   const featureControlNames = new Map()

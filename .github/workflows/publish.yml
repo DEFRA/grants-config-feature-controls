@@ -27,6 +27,12 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@d6babd68999697f02f459fc57a57ca94bb3c4862 # v45.0.0
+        with:
+          files: feature-controls/**
+
       - name: Setup Node
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 #7.0.0
         with:
@@ -39,9 +45,10 @@ jobs:
           npm test
 
       - name: Validate feature controls
+        if: steps.changed-files.outputs.any_changed == 'true'
         run: |
           curl -s https://raw.githubusercontent.com/DEFRA/grants-config-broker/main/src/routes/api/feature-control/feature-control-schemas.js -o scripts/feature-control-schemas.temp.js
-          node scripts/validate-feature-controls.js
+          node scripts/validate-feature-controls.js ${{ steps.changed-files.outputs.all_changed_files }}
           rm scripts/feature-control-schemas.temp.js
 
       - name: SonarCloud Scan

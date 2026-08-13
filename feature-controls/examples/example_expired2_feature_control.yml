@@ -1,8 +1,8 @@
 ---
-name: EXAMPLE_EXPIRED
-displayName: Example Control (Expired)
+name: EXAMPLE_EXPIRED2
+displayName: Example Control (Expired2)
 type: string
-description: Example expired feature control
+description: Example expired feature control, this (and only this) should fail build pipeline
 scopes:
   - service.config-management
 owner: Grants Framework
