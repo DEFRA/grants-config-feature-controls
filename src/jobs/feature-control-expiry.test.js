@@ -83,7 +83,9 @@ describe('feature-control-expiry', () => {
       const error = new Error('Network error')
       fetch.mockRejectedValue(error)
 
-      await featureControlExpiryJob(server)
+      await expect(featureControlExpiryJob(server)).rejects.toThrow(
+        'Network error'
+      )
 
       expect(server.logger.error).toHaveBeenCalledWith(
         error,
@@ -91,10 +93,8 @@ describe('feature-control-expiry', () => {
           "Error notifying the config broker about feature control 'feature1'"
         )
       )
-      expect(setFeatureControlToExpired).toHaveBeenCalledWith(
-        server.db,
-        expiredControls[0]
-      )
+      // Since it throws, setFeatureControlToExpired should NOT be called for this one
+      expect(setFeatureControlToExpired).not.toHaveBeenCalled()
     })
 
     it('should include authenticated headers if auth is enabled', async () => {

@@ -307,12 +307,15 @@ describe('informBrokerOfFeatureControls', () => {
       initial_value: [{ name: 'default', value: true }]
     })
     findFeatureControlByName.mockResolvedValue(null)
-    fetch.mockRejectedValue(new Error('Network error'))
+    const error = new Error('Network error')
+    fetch.mockRejectedValue(error)
 
-    await informBrokerOfFeatureControls(mockServer)
+    await expect(
+      informBrokerOfFeatureControls(mockServer)
+    ).resolves.not.toThrow()
 
     expect(mockLogger.error).toHaveBeenCalledWith(
-      expect.any(Error),
+      error,
       expect.stringContaining(
         "Error notifying the config broker about feature control 'TEST':"
       )
