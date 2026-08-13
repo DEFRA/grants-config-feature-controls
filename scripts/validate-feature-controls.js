@@ -36,9 +36,7 @@ const getAllYamlFiles = (dirPath, arrayOfFiles = []) => {
 }
 
 const validate = () => {
-  const { files, isAllFiles } = getFilesToValidate(
-    process.argv.slice(2)
-  )
+  const { files, isAllFiles } = getFilesToValidate(process.argv.slice(2))
 
   let hasError = false
 
