@@ -36,23 +36,14 @@ const getAllYamlFiles = (dirPath, arrayOfFiles = []) => {
 }
 
 const validate = () => {
-  const args = process.argv.slice(2)
-  let files = []
-
-  if (args.length > 0) {
-    files = args.filter((file) => file.endsWith('.yml'))
-    if (files.length === 0) {
-      console.log('No feature control files to validate.')
-      return
-    }
-  } else {
-    files = getAllYamlFiles(controlsDirectory)
-  }
+  const { filesToValidate, isAllFiles } = getFilesToValidate(
+    process.argv.slice(2)
+  )
 
   let hasError = false
-  const featureControlNames = new Map()
 
-  for (const filePath of files) {
+  // Firstly, check that the feature controls are valid against the schema
+  for (const filePath of filesToValidate) {
     try {
       const fileContent = readFileSync(filePath, 'utf8')
       const yamlData = load(fileContent)
@@ -62,17 +53,8 @@ const validate = () => {
         continue
       }
 
-      const name = yamlData.name ? yamlData.name.toUpperCase() : undefined
-      if (name) {
-        if (featureControlNames.has(name)) {
-          featureControlNames.get(name).push(filePath)
-        } else {
-          featureControlNames.set(name, [filePath])
-        }
-      }
-
       const featureControl = {
-        name,
+        name: yamlData.name ? yamlData.name.toUpperCase() : undefined,
         displayName: yamlData.displayName,
         type: yamlData.type,
         description: yamlData.description,
@@ -118,19 +100,65 @@ const validate = () => {
     }
   }
 
-  for (const [name, filePaths] of featureControlNames.entries()) {
-    if (filePaths.length > 1) {
-      console.error(`Duplicate feature control name found: ${name}`)
-      filePaths.forEach((filePath) => {
-        console.error(`  - ${filePath}`)
-      })
-      hasError = true
-    }
+  // Then, check for duplicate feature control names
+  const duplicateNames = getDuplicateNames(filesToValidate, isAllFiles)
+  for (const [name, filePaths] of duplicateNames) {
+    console.error(`Duplicate feature control name found: ${name}`)
+    filePaths.forEach((filePath) => {
+      console.error(`  - ${filePath}`)
+    })
+    hasError = true
   }
 
   if (hasError) {
     process.exit(1)
   }
+}
+
+const getFilesToValidate = (args) => {
+  if (args.length > 0) {
+    const filesToValidate = args.filter((file) => file.endsWith('.yml'))
+    return { files: filesToValidate, isAllFiles: false }
+  } else {
+    const filesToValidate = getAllYamlFiles(controlsDirectory)
+    return { files: filesToValidate, isAllFiles: true }
+  }
+}
+
+const getDuplicateNames = (files, isAllFiles) => {
+  const duplicateNames = new Map()
+  const nameToFilePaths = new Map()
+
+  const allFiles = isAllFiles ? files : getAllYamlFiles(controlsDirectory)
+  for (const filePath of allFiles) {
+    try {
+      const fileContent = readFileSync(filePath, 'utf8')
+      const yamlData = load(fileContent)
+
+      if (yamlData && yamlData.name) {
+        const name = yamlData.name.toUpperCase()
+        if (!nameToFilePaths.has(name)) {
+          nameToFilePaths.set(name, [])
+        }
+        nameToFilePaths.get(name).push(filePath)
+      }
+    } catch {
+      // Ignore any errors handled in the main validation
+    }
+  }
+
+  for (const [name, filePaths] of nameToFilePaths.entries()) {
+    if (filePaths.length > 1) {
+      // If we are validating a subset of files, we only care if one of the duplicates is in our subset
+      const containsValidatedFile =
+        isAllFiles || filePaths.some((fp) => files.includes(fp))
+      if (containsValidatedFile) {
+        duplicateNames.set(name, filePaths)
+      }
+    }
+  }
+
+  return duplicateNames
 }
 
 validate()
