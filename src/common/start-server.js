@@ -1,6 +1,7 @@
 import { config } from '#/config.js'
 import { createServer } from '#/server.js'
 import { informBrokerOfFeatureControls } from '#/services/feature-control-store-and-inform.js'
+import { startFeatureExpiryJob } from '#/jobs/feature-control-expiry.js'
 
 export async function startServer() {
   const server = await createServer()
@@ -12,6 +13,8 @@ export async function startServer() {
   )
 
   await informBrokerOfFeatureControls(server)
+
+  startFeatureExpiryJob()
 
   return server
 }
