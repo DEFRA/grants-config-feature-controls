@@ -98,7 +98,7 @@ describe('config-broker-api', () => {
       )
       expect(server.logger.info).toHaveBeenCalledWith(
         expect.stringContaining(
-          "Successfully notified the config broker about feature control 'EXPIRED_FEATURE'"
+          "Successfully notified the config broker about feature control expiry 'EXPIRED_FEATURE'"
         )
       )
     })
@@ -115,7 +115,7 @@ describe('config-broker-api', () => {
       expect(server.logger.error).toHaveBeenCalledWith(
         error,
         expect.stringContaining(
-          "Error notifying the config broker about feature control 'EXPIRED_FEATURE':"
+          "Error notifying the config broker about feature control expiry 'EXPIRED_FEATURE':"
         )
       )
     })

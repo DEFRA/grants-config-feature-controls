@@ -68,7 +68,7 @@ describe('feature-control-expiry', () => {
 
       expect(server.logger.error).toHaveBeenCalledWith(
         expect.stringContaining(
-          "Failed to notify the config broker about feature control 'feature1'"
+          "Failed to notify the config broker about feature control expiry 'feature1'"
         )
       )
       expect(setFeatureControlToExpired).toHaveBeenCalledWith(
@@ -90,7 +90,7 @@ describe('feature-control-expiry', () => {
       expect(server.logger.error).toHaveBeenCalledWith(
         error,
         expect.stringContaining(
-          "Error notifying the config broker about feature control 'feature1'"
+          "Error notifying the config broker about feature control expiry 'feature1'"
         )
       )
       // Since it throws, setFeatureControlToExpired should NOT be called for this one

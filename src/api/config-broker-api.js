@@ -11,6 +11,7 @@ export const notifyFeatureControlCreatedOrUpdated = async (
 
   try {
     const headers = await getHeaders(server)
+
     const response = await fetch(url.href, {
       method: 'POST',
       headers,
@@ -39,6 +40,7 @@ export const notifyFeatureControlExpired = async (payload, server) => {
 
   try {
     const headers = await getHeaders(server)
+
     const response = await fetch(url.href, {
       method: 'PUT',
       headers,
@@ -48,13 +50,13 @@ export const notifyFeatureControlExpired = async (payload, server) => {
     await handleResponse(
       response,
       logger,
-      `Successfully notified the config broker about feature control '${payload.name}'`,
-      `Failed to notify the config broker about feature control '${payload.name}'.`
+      `Successfully notified the config broker about feature control expiry '${payload.name}'`,
+      `Failed to notify the config broker about feature control expiry '${payload.name}'.`
     )
   } catch (err) {
     logger.error(
       err,
-      `Error notifying the config broker about feature control '${payload.name}':`
+      `Error notifying the config broker about feature control expiry '${payload.name}':`
     )
     throw err
   }
