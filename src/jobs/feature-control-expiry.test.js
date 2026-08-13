@@ -8,7 +8,7 @@ import { config } from '#/config.js'
 import {
   findNewlyExpiredFeatureControls,
   setFeatureControlToExpired
-} from '#/repository/feature-control-repository.js'
+} from '../repository/feature-control-repository.js'
 import { createAuthenticatedHeaders } from '@defra/grants-config-utils/broker'
 
 vi.mock('node-cron', () => ({
