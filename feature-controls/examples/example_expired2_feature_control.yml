@@ -1,12 +1,12 @@
 ---
-name: EXAMPLE_EXPIRED
+name: EXAMPLE_EXPIRED2
 displayName: Example Control (Expired2)
 type: string
 description: Example expired feature control, this (and only this) should fail build pipeline
 scopes:
   - service.config-management
 owner: Grants Framework
-expiryDate: 2026-08-10
+expiryDate: 2026-08-15
 initial_value:
   - name: default
     value: 'expires in two days'
