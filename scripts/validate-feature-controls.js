@@ -98,7 +98,7 @@ const validate = () => {
     }
   }
 
-  // Then, check for duplicate feature control names
+  // Then, check all files for duplicate feature control names
   const duplicateNames = getDuplicateNames(files, isAllFiles)
   for (const [name, filePaths] of duplicateNames) {
     console.error(`Duplicate feature control name found: ${name}`)
@@ -124,10 +124,9 @@ const getFilesToValidate = (args) => {
 }
 
 const getDuplicateNames = (files, isAllFiles) => {
-  const duplicateNames = new Map()
   const nameToFilePaths = new Map()
-
   const allFiles = isAllFiles ? files : getAllYamlFiles(controlsDirectory)
+
   for (const filePath of allFiles) {
     try {
       const fileContent = readFileSync(filePath, 'utf8')
@@ -145,18 +144,9 @@ const getDuplicateNames = (files, isAllFiles) => {
     }
   }
 
-  for (const [name, filePaths] of nameToFilePaths.entries()) {
-    if (filePaths.length > 1) {
-      // If we are validating a subset of files, we only care if one of the duplicates is in our subset
-      const containsValidatedFile =
-        isAllFiles || filePaths.some((fp) => files.includes(fp))
-      if (containsValidatedFile) {
-        duplicateNames.set(name, filePaths)
-      }
-    }
-  }
-
-  return duplicateNames
+  return nameToFilePaths
+    .entries()
+    .filter(([_, filePaths]) => filePaths.length > 1)
 }
 
 validate()
