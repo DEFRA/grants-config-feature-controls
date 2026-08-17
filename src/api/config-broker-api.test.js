@@ -1,7 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import {
+  getFeatureControl,
   notifyFeatureControlCreatedOrUpdated,
-  notifyFeatureControlExpired
+  notifyFeatureControlExpired,
+  notifyFeatureControlWithdrawn
 } from './config-broker-api.js'
 import { config } from '#/config.js'
 import { createAuthenticatedHeaders } from '@defra/grants-config-utils/broker'
@@ -116,6 +118,84 @@ describe('config-broker-api', () => {
         error,
         expect.stringContaining(
           "Error notifying the config broker about feature control expiry 'EXPIRED_FEATURE':"
+        )
+      )
+    })
+  })
+
+  describe('getFeatureControl', () => {
+    it('should return data when response is ok', async () => {
+      const data = { name: 'TEST_FEATURE' }
+      fetch.mockResolvedValue({
+        ok: true,
+        json: vi.fn().mockResolvedValue(data)
+      })
+
+      const result = await getFeatureControl('TEST_FEATURE', server)
+
+      expect(result).toEqual(data)
+      expect(fetch).toHaveBeenCalledWith(
+        expect.stringContaining('/TEST_FEATURE'),
+        expect.objectContaining({ method: 'GET' })
+      )
+    })
+
+    it('should return null when response is not ok', async () => {
+      fetch.mockResolvedValue({ ok: false })
+
+      const result = await getFeatureControl('TEST_FEATURE', server)
+
+      expect(result).toBeNull()
+    })
+
+    it('should handle fetch exception', async () => {
+      const error = new Error('Network Error')
+      fetch.mockRejectedValue(error)
+
+      await expect(getFeatureControl('TEST_FEATURE', server)).rejects.toThrow(
+        'Network Error'
+      )
+      expect(server.logger.error).toHaveBeenCalledWith(
+        error,
+        expect.stringContaining('Error fetching feature control: TEST_FEATURE')
+      )
+    })
+  })
+
+  describe('notifyFeatureControlWithdrawn', () => {
+    it('should call fetch with PUT and correct payload', async () => {
+      const payload = { name: 'WITHDRAWN_FEATURE', status: 'withdrawn' }
+      fetch.mockResolvedValue({ ok: true })
+
+      await notifyFeatureControlWithdrawn(payload, server)
+
+      expect(fetch).toHaveBeenCalledWith(
+        config.get('configBroker.apiUrl') + '/status',
+        expect.objectContaining({
+          method: 'PUT',
+          body: JSON.stringify(payload)
+        })
+      )
+      expect(server.logger.info).toHaveBeenCalledWith(
+        expect.stringContaining(
+          "Successfully notified the config broker about feature control withdrawn 'WITHDRAWN_FEATURE'"
+        )
+      )
+    })
+
+    it('should handle fetch exception', async () => {
+      const payload = { name: 'WITHDRAWN_FEATURE' }
+      const error = new Error('Network Error')
+      fetch.mockRejectedValue(error)
+
+      await expect(
+        notifyFeatureControlWithdrawn(payload, server)
+      ).rejects.toThrow('Network Error')
+
+      expect(server.logger.error).toHaveBeenCalledWith(
+        error,
+        expect.stringContaining(
+          "Error notifying the config broker about feature control withdrawn 'WITHDRAWN_FEATURE':"
         )
       )
     })

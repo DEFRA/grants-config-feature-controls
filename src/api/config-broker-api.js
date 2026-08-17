@@ -1,6 +1,26 @@
 import { config } from '../config.js'
 import { createAuthenticatedHeaders } from '@defra/grants-config-utils/broker'
 
+export const getFeatureControl = async (name, server) => {
+  const { logger } = server
+  const apiUrl = config.get('configBroker.apiUrl') + '/' + name
+  const url = new URL(apiUrl)
+
+  try {
+    const headers = await getHeaders(server)
+
+    const response = await fetch(url.href, {
+      method: 'GET',
+      headers
+    })
+
+    return response.ok ? await response.json() : null
+  } catch (err) {
+    logger.error(err, 'Error fetching feature control: ' + name)
+    throw err
+  }
+}
+
 export const notifyFeatureControlCreatedOrUpdated = async (
   featureControl,
   server
@@ -57,6 +77,35 @@ export const notifyFeatureControlExpired = async (payload, server) => {
     logger.error(
       err,
       `Error notifying the config broker about feature control expiry '${payload.name}':`
+    )
+    throw err
+  }
+}
+
+export const notifyFeatureControlWithdrawn = async (payload, server) => {
+  const { logger } = server
+  const apiUrl = config.get('configBroker.apiUrl') + '/status'
+  const url = new URL(apiUrl)
+
+  try {
+    const headers = await getHeaders(server)
+
+    const response = await fetch(url.href, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify(payload)
+    })
+
+    await handleResponse(
+      response,
+      logger,
+      `Successfully notified the config broker about feature control withdrawn '${payload.name}'`,
+      `Failed to notify the config broker about feature control withdrawn '${payload.name}'.`
+    )
+  } catch (err) {
+    logger.error(
+      err,
+      `Error notifying the config broker about feature control withdrawn '${payload.name}':`
     )
     throw err
   }

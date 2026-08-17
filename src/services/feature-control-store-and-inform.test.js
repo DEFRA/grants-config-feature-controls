@@ -4,7 +4,8 @@ import { load } from 'js-yaml'
 import { config } from '../config.js'
 import {
   findFeatureControlByName,
-  upsertFeatureControl
+  upsertFeatureControl,
+  setFeatureControlToWithdrawn
 } from '../repository/feature-control-repository.js'
 import { createAuthenticatedHeaders } from '@defra/grants-config-utils/broker'
 
@@ -77,6 +78,49 @@ describe('informBrokerOfFeatureControls', () => {
       expect.objectContaining({ name: 'TEST' })
     )
     expect(fetch).toHaveBeenCalled()
+  })
+
+  test('should withdraw feature control if not in current environment but exists in broker', async () => {
+    existsSync.mockReturnValue(true)
+    readdirSync.mockReturnValue(['test.yml'])
+    readFileSync.mockReturnValue('content')
+    load.mockReturnValue({
+      name: 'WITHDRAWN_TEST',
+      displayName: 'Test Control',
+      type: 'boolean',
+      description: 'desc',
+      scopes: ['scope'],
+      owner: 'owner',
+      expiryDate: '2027-01-01',
+      initial_value: [{ name: 'default', value: true }],
+      environments: ['production'] // Not in 'local' which is configured in beforeEach
+    })
+    findFeatureControlByName.mockResolvedValue(null)
+    // First fetch for getFeatureControl, second for notifyFeatureControlWithdrawn
+    fetch
+      .mockResolvedValueOnce({
+        ok: true,
+        json: vi.fn().mockResolvedValue({ name: 'WITHDRAWN_TEST' })
+      })
+      .mockResolvedValueOnce({ ok: true })
+
+    await informBrokerOfFeatureControls(mockServer)
+
+    expect(fetch).toHaveBeenCalledWith(
+      expect.stringContaining('/WITHDRAWN_TEST'),
+      expect.objectContaining({ method: 'GET' })
+    )
+    expect(fetch).toHaveBeenCalledWith(
+      expect.stringContaining('/status'),
+      expect.objectContaining({
+        method: 'PUT',
+        body: expect.stringContaining('"status":"withdrawn"')
+      })
+    )
+    expect(setFeatureControlToWithdrawn).toHaveBeenCalledWith(
+      mockDb,
+      expect.objectContaining({ name: 'WITHDRAWN_TEST' })
+    )
   })
 
   test('should not notify broker if no change', async () => {
@@ -386,7 +430,7 @@ describe('informBrokerOfFeatureControls', () => {
     )
   })
 
-  test('should store control but not notify broker when current env is not in environments', async () => {
+  test('should store control but not notify broker when current env is not in environments and not in broker', async () => {
     existsSync.mockReturnValue(true)
     readdirSync.mockReturnValue(['test.yml'])
     readFileSync.mockReturnValue('content')
@@ -402,6 +446,7 @@ describe('informBrokerOfFeatureControls', () => {
       initial_value: [{ name: 'default', value: true }]
     })
     findFeatureControlByName.mockResolvedValue(null)
+    fetch.mockResolvedValue({ ok: false }) // Simulate not found in broker
 
     await informBrokerOfFeatureControls(mockServer)
 
@@ -409,7 +454,12 @@ describe('informBrokerOfFeatureControls', () => {
       mockDb,
       expect.objectContaining({ name: 'TEST' })
     )
-    expect(fetch).not.toHaveBeenCalled()
+    expect(fetch).toHaveBeenCalledWith(
+      expect.stringContaining('/TEST'),
+      expect.objectContaining({ method: 'GET' })
+    )
+    // Only one call for the GET check, no notify call
+    expect(fetch).toHaveBeenCalledTimes(1)
   })
 
   test('should store control and notify broker when current env is in environments', async () => {

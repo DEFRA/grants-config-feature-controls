@@ -32,3 +32,12 @@ export const setFeatureControlToExpired = async (db, featureControl) => {
       { $set: { notifiedExpired: true } }
     )
 }
+
+export const setFeatureControlToWithdrawn = async (db, featureControl) => {
+  return db
+    .collection(FEATURE_CONTROL_COLLECTION_NAME)
+    .updateOne(
+      { name: featureControl.name },
+      { $set: { notifiedWithdrawn: true } }
+    )
+}
