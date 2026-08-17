@@ -1,9 +1,11 @@
 import { config } from '../config.js'
 import { createAuthenticatedHeaders } from '@defra/grants-config-utils/broker'
 
+const brokerApiUrl = config.get('configBroker.apiUrl')
+
 export const getFeatureControl = async (name, server) => {
   const { logger } = server
-  const apiUrl = config.get('configBroker.apiUrl') + '/' + name
+  const apiUrl = brokerApiUrl + '/' + name
   const url = new URL(apiUrl)
 
   try {
@@ -26,7 +28,7 @@ export const notifyFeatureControlCreatedOrUpdated = async (
   server
 ) => {
   const { logger } = server
-  const apiUrl = config.get('configBroker.apiUrl')
+  const apiUrl = brokerApiUrl
   const url = new URL(apiUrl)
 
   try {
@@ -55,7 +57,7 @@ export const notifyFeatureControlCreatedOrUpdated = async (
 
 export const notifyFeatureControlExpired = async (payload, server) => {
   const { logger } = server
-  const apiUrl = config.get('configBroker.apiUrl') + '/status'
+  const apiUrl = brokerApiUrl + '/status'
   const url = new URL(apiUrl)
 
   try {
@@ -84,7 +86,7 @@ export const notifyFeatureControlExpired = async (payload, server) => {
 
 export const notifyFeatureControlWithdrawn = async (payload, server) => {
   const { logger } = server
-  const apiUrl = config.get('configBroker.apiUrl') + '/status'
+  const apiUrl = brokerApiUrl + '/status'
   const url = new URL(apiUrl)
 
   try {
