@@ -1,10 +1,12 @@
 import { config } from '../config.js'
 import { createAuthenticatedHeaders } from '@defra/grants-config-utils/broker'
 
-const brokerApiUrl = config.get('configBroker.apiUrl')
-
 export const getFeatureControl = async (name, server) => {
   const { logger } = server
+  const brokerApiUrl = config.get('configBroker.apiUrl')
+  if (!brokerApiUrl) {
+    throw new Error('configBroker.apiUrl is not configured')
+  }
   const apiUrl = brokerApiUrl + '/' + name
   const url = new URL(apiUrl)
 
@@ -28,6 +30,7 @@ export const notifyFeatureControlCreatedOrUpdated = async (
   server
 ) => {
   const { logger } = server
+  const brokerApiUrl = config.get('configBroker.apiUrl')
   const apiUrl = brokerApiUrl
   const url = new URL(apiUrl)
 
@@ -57,6 +60,7 @@ export const notifyFeatureControlCreatedOrUpdated = async (
 
 export const notifyFeatureControlExpired = async (payload, server) => {
   const { logger } = server
+  const brokerApiUrl = config.get('configBroker.apiUrl')
   const apiUrl = brokerApiUrl + '/status'
   const url = new URL(apiUrl)
 
@@ -86,6 +90,7 @@ export const notifyFeatureControlExpired = async (payload, server) => {
 
 export const notifyFeatureControlWithdrawn = async (payload, server) => {
   const { logger } = server
+  const brokerApiUrl = config.get('configBroker.apiUrl')
   const apiUrl = brokerApiUrl + '/status'
   const url = new URL(apiUrl)
 
