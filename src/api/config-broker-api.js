@@ -1,63 +1,98 @@
 import { config } from '../config.js'
 import { createAuthenticatedHeaders } from '@defra/grants-config-utils/broker'
 
-export const notifyFeatureControlCreatedOrUpdated = async (
-  featureControl,
-  server
-) => {
+const brokerApiUrlConfigKey = 'configBroker.apiUrl'
+
+export const getFeatureControl = async (name, server) => {
   const { logger } = server
-  const apiUrl = config.get('configBroker.apiUrl')
+  const brokerApiUrl = config.get(brokerApiUrlConfigKey)
+  const apiUrl = `${brokerApiUrl}/${name}`
   const url = new URL(apiUrl)
 
   try {
     const headers = await getHeaders(server)
 
     const response = await fetch(url.href, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(featureControl)
+      method: 'GET',
+      headers
     })
 
-    await handleResponse(
-      response,
-      logger,
-      `Successfully notified the config broker about feature control '${featureControl.name}'`,
-      `Failed to notify the config broker about feature control '${featureControl.name}'.`
-    )
+    return response.ok ? await response.json() : null
   } catch (err) {
-    logger.error(
-      err,
-      `Error notifying the config broker about feature control '${featureControl.name}':`
-    )
+    logger.error(err, 'Error fetching feature control: ' + name)
     throw err
   }
 }
 
+export const notifyFeatureControlCreatedOrUpdated = async (
+  featureControl,
+  server
+) => {
+  await notify(
+    {
+      method: 'POST',
+      body: JSON.stringify(featureControl),
+      path: ''
+    },
+    server,
+    `Successfully notified the config broker about feature control '${featureControl.name}'`,
+    `Failed to notify the config broker about feature control '${featureControl.name}'.`,
+    `Error notifying the config broker about feature control '${featureControl.name}':`
+  )
+}
+
 export const notifyFeatureControlExpired = async (payload, server) => {
+  await notify(
+    {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+      path: '/status'
+    },
+    server,
+    `Successfully notified the config broker about feature control expiry '${payload.name}'`,
+    `Failed to notify the config broker about feature control expiry '${payload.name}'.`,
+    `Error notifying the config broker about feature control expiry '${payload.name}':`
+  )
+}
+
+export const notifyFeatureControlWithdrawn = async (payload, server) => {
+  await notify(
+    {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+      path: '/status'
+    },
+    server,
+    `Successfully notified the config broker about feature control withdrawn '${payload.name}'`,
+    `Failed to notify the config broker about feature control withdrawn '${payload.name}'.`,
+    `Error notifying the config broker about feature control withdrawn '${payload.name}':`
+  )
+}
+
+const notify = async (
+  requestOptions,
+  server,
+  successMessage,
+  errorMessage,
+  exceptionMessage
+) => {
   const { logger } = server
-  const apiUrl = config.get('configBroker.apiUrl') + '/status'
+  const brokerApiUrl = config.get(brokerApiUrlConfigKey)
+  const apiUrl = brokerApiUrl + (requestOptions.path || '')
   const url = new URL(apiUrl)
 
   try {
     const headers = await getHeaders(server)
 
     const response = await fetch(url.href, {
-      method: 'PUT',
+      method: requestOptions.method,
       headers,
-      body: JSON.stringify(payload)
+      body: requestOptions.body
     })
 
-    await handleResponse(
-      response,
-      logger,
-      `Successfully notified the config broker about feature control expiry '${payload.name}'`,
-      `Failed to notify the config broker about feature control expiry '${payload.name}'.`
-    )
+    await handleResponse(response, logger, successMessage, errorMessage)
   } catch (err) {
-    logger.error(
-      err,
-      `Error notifying the config broker about feature control expiry '${payload.name}':`
-    )
+    logger.error(err, exceptionMessage)
     throw err
   }
 }

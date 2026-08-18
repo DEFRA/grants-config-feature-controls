@@ -5,9 +5,14 @@ import { load } from 'js-yaml'
 import { config } from '../config.js'
 import {
   findFeatureControlByName,
-  upsertFeatureControl
+  upsertFeatureControl,
+  setFeatureControlToWithdrawn
 } from '../repository/feature-control-repository.js'
-import { notifyFeatureControlCreatedOrUpdated } from '../api/config-broker-api.js'
+import {
+  getFeatureControl,
+  notifyFeatureControlCreatedOrUpdated,
+  notifyFeatureControlWithdrawn
+} from '../api/config-broker-api.js'
 
 const controlsDirectory = 'feature-controls'
 
@@ -98,6 +103,8 @@ const processFeatureControlFile = async (
 
       if (shouldSendToBroker) {
         await notifyFeatureControlCreatedOrUpdated(featureControl, server)
+      } else {
+        await withdrawFeatureControlIfExistsInBroker(featureControl, server)
       }
     } else {
       logger.info(
@@ -119,6 +126,23 @@ const checkIfNewOrUpdated = async (db, featureControl) => {
   const { _id, ...existingData } = existing
 
   return !isDeepStrictEqual(existingData, featureControl)
+}
+
+const withdrawFeatureControlIfExistsInBroker = async (
+  featureControl,
+  server
+) => {
+  if (await getFeatureControl(featureControl.name, server)) {
+    const payload = {
+      name: featureControl.name,
+      status: 'withdrawn',
+      user: featureControl.createdBy,
+      note: 'Withdrawn — definition updated'
+    }
+    await notifyFeatureControlWithdrawn(payload, server)
+
+    await setFeatureControlToWithdrawn(server.db, featureControl)
+  }
 }
 
 const transformEnvironmentValues = (initialValueArrayOrObject) => {
