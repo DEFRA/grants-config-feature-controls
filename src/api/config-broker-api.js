@@ -6,9 +6,6 @@ const brokerApiUrlConfigKey = 'configBroker.apiUrl'
 export const getFeatureControl = async (name, server) => {
   const { logger } = server
   const brokerApiUrl = config.get(brokerApiUrlConfigKey)
-  if (!brokerApiUrl) {
-    throw new Error('configBroker.apiUrl is not configured')
-  }
   const apiUrl = `${brokerApiUrl}/${name}`
   const url = new URL(apiUrl)
 
@@ -38,7 +35,6 @@ export const notifyFeatureControlCreatedOrUpdated = async (
       path: ''
     },
     server,
-    featureControl.name,
     `Successfully notified the config broker about feature control '${featureControl.name}'`,
     `Failed to notify the config broker about feature control '${featureControl.name}'.`,
     `Error notifying the config broker about feature control '${featureControl.name}':`
@@ -53,7 +49,6 @@ export const notifyFeatureControlExpired = async (payload, server) => {
       path: '/status'
     },
     server,
-    payload.name,
     `Successfully notified the config broker about feature control expiry '${payload.name}'`,
     `Failed to notify the config broker about feature control expiry '${payload.name}'.`,
     `Error notifying the config broker about feature control expiry '${payload.name}':`
@@ -68,7 +63,6 @@ export const notifyFeatureControlWithdrawn = async (payload, server) => {
       path: '/status'
     },
     server,
-    payload.name,
     `Successfully notified the config broker about feature control withdrawn '${payload.name}'`,
     `Failed to notify the config broker about feature control withdrawn '${payload.name}'.`,
     `Error notifying the config broker about feature control withdrawn '${payload.name}':`
@@ -78,16 +72,12 @@ export const notifyFeatureControlWithdrawn = async (payload, server) => {
 const notify = async (
   requestOptions,
   server,
-  resourceName,
   successMessage,
   errorMessage,
   exceptionMessage
 ) => {
   const { logger } = server
   const brokerApiUrl = config.get(brokerApiUrlConfigKey)
-  if (!brokerApiUrl) {
-    throw new Error('configBroker.apiUrl is not configured')
-  }
   const apiUrl = brokerApiUrl + (requestOptions.path || '')
   const url = new URL(apiUrl)
 
