@@ -12,3 +12,4 @@ initial_value:
     value: 'withdrawn example'
 environments:
   - local
+  - dev
