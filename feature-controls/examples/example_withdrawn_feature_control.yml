@@ -2,7 +2,7 @@
 name: EXAMPLE_WITHDRAWN
 displayName: Example Control (Withdrawn)
 type: string
-description: Example withdrawn feature control, will be withdrawn from dev/test in next version
+description: Example withdrawn feature control, should now be withdrawn from dev/test
 scopes:
   - service.config-management
 owner: Grants Framework
@@ -12,5 +12,3 @@ initial_value:
     value: 'withdrawn example'
 environments:
   - local
-  - dev
-  - test
