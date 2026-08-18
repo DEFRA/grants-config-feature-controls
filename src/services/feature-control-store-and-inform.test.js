@@ -123,6 +123,35 @@ describe('informBrokerOfFeatureControls', () => {
     )
   })
 
+  test('should not proceed if feature control has already been withdrawn', async () => {
+    readdirSync.mockReturnValue(['test.yml'])
+    readFileSync.mockReturnValue('content')
+    load.mockReturnValue({
+      name: 'WITHDRAWN_TEST',
+      displayName: 'Test Control',
+      type: 'boolean',
+      description: 'desc',
+      scopes: ['scope'],
+      owner: 'owner',
+      expiryDate: '2027-01-01',
+      initial_value: [{ name: 'default', value: true }]
+    })
+    findFeatureControlByName.mockResolvedValue({
+      name: 'WITHDRAWN_TEST',
+      notifiedWithdrawn: true
+    })
+
+    await informBrokerOfFeatureControls(mockServer)
+
+    expect(mockLogger.info).toHaveBeenCalledWith(
+      expect.stringContaining(
+        'Feature control WITHDRAWN_TEST is up to date or been withdrawn, will not inform config-broker'
+      )
+    )
+    expect(upsertFeatureControl).not.toHaveBeenCalled()
+    expect(fetch).not.toHaveBeenCalled()
+  })
+
   test('should not notify broker if no change', async () => {
     existsSync.mockReturnValue(true)
     readdirSync.mockReturnValue(['test.yml'])

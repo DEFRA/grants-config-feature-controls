@@ -108,7 +108,7 @@ const processFeatureControlFile = async (
       }
     } else {
       logger.info(
-        `Feature control ${featureControl.name} is up to date, will not inform config-broker`
+        `Feature control ${featureControl.name} is up to date or been withdrawn, will not inform config-broker`
       )
     }
   } catch (err) {
@@ -120,6 +120,11 @@ const checkIfNewOrUpdated = async (db, featureControl) => {
   const existing = await findFeatureControlByName(db, featureControl.name)
   if (!existing) {
     return true
+  }
+
+  // can't be reintroduced to the config broker once withdrawn
+  if (existing.notifiedWithdrawn) {
+    return false
   }
 
   // remove MongoDB internal fields
