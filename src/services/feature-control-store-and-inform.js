@@ -122,7 +122,7 @@ const checkIfNewOrUpdated = async (db, featureControl) => {
     return true
   }
 
-  // can't be reintroduced to the config broker once withdrawn
+  // once withdrawn, can't be updated or reintroduced to the config broker
   if (existing.notifiedWithdrawn) {
     return false
   }
