@@ -6,12 +6,12 @@ import { config } from '../config.js'
 import {
   findFeatureControlByName,
   upsertFeatureControl,
-  setFeatureControlToWithdrawn
+  setFeatureControlToRemoved
 } from '../repository/feature-control-repository.js'
 import {
   getFeatureControl,
   notifyFeatureControlCreatedOrUpdated,
-  notifyFeatureControlWithdrawn
+  notifyFeatureControlRemoved
 } from '../api/config-broker-api.js'
 
 const controlsDirectory = 'feature-controls'
@@ -104,11 +104,11 @@ const processFeatureControlFile = async (
       if (shouldSendToBroker) {
         await notifyFeatureControlCreatedOrUpdated(featureControl, server)
       } else {
-        await withdrawFeatureControlIfExistsInBroker(featureControl, server)
+        await removeFeatureControlIfExistsInBroker(featureControl, server)
       }
     } else {
       logger.info(
-        `Feature control ${featureControl.name} is up to date or been withdrawn, will not inform config-broker`
+        `Feature control ${featureControl.name} is up to date or been removed, will not inform config-broker`
       )
     }
   } catch (err) {
@@ -122,8 +122,8 @@ const checkIfNewOrUpdated = async (db, featureControl) => {
     return true
   }
 
-  // once withdrawn, can't be updated or reintroduced to the config broker
-  if (existing.notifiedWithdrawn) {
+  // once removed, can't be updated or reintroduced to the config broker
+  if (existing.notifiedRemoved) {
     return false
   }
 
@@ -133,20 +133,17 @@ const checkIfNewOrUpdated = async (db, featureControl) => {
   return !isDeepStrictEqual(existingData, featureControl)
 }
 
-const withdrawFeatureControlIfExistsInBroker = async (
-  featureControl,
-  server
-) => {
+const removeFeatureControlIfExistsInBroker = async (featureControl, server) => {
   if (await getFeatureControl(featureControl.name, server)) {
     const payload = {
       name: featureControl.name,
-      status: 'withdrawn',
+      status: 'removed',
       user: featureControl.createdBy,
-      note: 'Withdrawn — definition updated'
+      note: 'Removed — definition updated'
     }
-    await notifyFeatureControlWithdrawn(payload, server)
+    await notifyFeatureControlRemoved(payload, server)
 
-    await setFeatureControlToWithdrawn(server.db, featureControl)
+    await setFeatureControlToRemoved(server.db, featureControl)
   }
 }
 

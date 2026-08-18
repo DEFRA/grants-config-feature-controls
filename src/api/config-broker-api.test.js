@@ -3,7 +3,7 @@ import {
   getFeatureControl,
   notifyFeatureControlCreatedOrUpdated,
   notifyFeatureControlExpired,
-  notifyFeatureControlWithdrawn
+  notifyFeatureControlRemoved
 } from './config-broker-api.js'
 import { config } from '#/config.js'
 import { createAuthenticatedHeaders } from '@defra/grants-config-utils/broker'
@@ -162,12 +162,12 @@ describe('config-broker-api', () => {
     })
   })
 
-  describe('notifyFeatureControlWithdrawn', () => {
+  describe('notifyFeatureControlRemoved', () => {
     it('should call fetch with PUT and correct payload', async () => {
-      const payload = { name: 'WITHDRAWN_FEATURE', status: 'withdrawn' }
+      const payload = { name: 'REMOVED_FEATURE', status: 'removed' }
       fetch.mockResolvedValue({ ok: true })
 
-      await notifyFeatureControlWithdrawn(payload, server)
+      await notifyFeatureControlRemoved(payload, server)
 
       expect(fetch).toHaveBeenCalledWith(
         config.get('configBroker.apiUrl') + '/status',
@@ -178,24 +178,24 @@ describe('config-broker-api', () => {
       )
       expect(server.logger.info).toHaveBeenCalledWith(
         expect.stringContaining(
-          "Successfully notified the config broker about feature control withdrawn 'WITHDRAWN_FEATURE'"
+          "Successfully notified the config broker about feature control removed 'REMOVED_FEATURE'"
         )
       )
     })
 
     it('should handle fetch exception', async () => {
-      const payload = { name: 'WITHDRAWN_FEATURE' }
+      const payload = { name: 'REMOVED_FEATURE' }
       const error = new Error('Network Error')
       fetch.mockRejectedValue(error)
 
       await expect(
-        notifyFeatureControlWithdrawn(payload, server)
+        notifyFeatureControlRemoved(payload, server)
       ).rejects.toThrow('Network Error')
 
       expect(server.logger.error).toHaveBeenCalledWith(
         error,
         expect.stringContaining(
-          "Error notifying the config broker about feature control withdrawn 'WITHDRAWN_FEATURE':"
+          "Error notifying the config broker about feature control removed 'REMOVED_FEATURE':"
         )
       )
     })

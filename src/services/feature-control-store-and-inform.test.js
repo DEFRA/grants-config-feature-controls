@@ -5,7 +5,7 @@ import { config } from '../config.js'
 import {
   findFeatureControlByName,
   upsertFeatureControl,
-  setFeatureControlToWithdrawn
+  setFeatureControlToRemoved
 } from '../repository/feature-control-repository.js'
 import { createAuthenticatedHeaders } from '@defra/grants-config-utils/broker'
 
@@ -80,12 +80,12 @@ describe('informBrokerOfFeatureControls', () => {
     expect(fetch).toHaveBeenCalled()
   })
 
-  test('should withdraw feature control if not in current environment but exists in broker', async () => {
+  test('should remove feature control if not in current environment but exists in broker', async () => {
     existsSync.mockReturnValue(true)
     readdirSync.mockReturnValue(['test.yml'])
     readFileSync.mockReturnValue('content')
     load.mockReturnValue({
-      name: 'WITHDRAWN_TEST',
+      name: 'REMOVED_TEST',
       displayName: 'Test Control',
       type: 'boolean',
       description: 'desc',
@@ -96,38 +96,38 @@ describe('informBrokerOfFeatureControls', () => {
       environments: ['production'] // Not in 'local' which is configured in beforeEach
     })
     findFeatureControlByName.mockResolvedValue(null)
-    // First fetch for getFeatureControl, second for notifyFeatureControlWithdrawn
+    // First fetch for getFeatureControl, second for notifyFeatureControlRemoved
     fetch
       .mockResolvedValueOnce({
         ok: true,
-        json: vi.fn().mockResolvedValue({ name: 'WITHDRAWN_TEST' })
+        json: vi.fn().mockResolvedValue({ name: 'REMOVED_TEST' })
       })
       .mockResolvedValueOnce({ ok: true })
 
     await informBrokerOfFeatureControls(mockServer)
 
     expect(fetch).toHaveBeenCalledWith(
-      expect.stringContaining('/WITHDRAWN_TEST'),
+      expect.stringContaining('/REMOVED_TEST'),
       expect.objectContaining({ method: 'GET' })
     )
     expect(fetch).toHaveBeenCalledWith(
       expect.stringContaining('/status'),
       expect.objectContaining({
         method: 'PUT',
-        body: expect.stringContaining('"status":"withdrawn"')
+        body: expect.stringContaining('"status":"removed"')
       })
     )
-    expect(setFeatureControlToWithdrawn).toHaveBeenCalledWith(
+    expect(setFeatureControlToRemoved).toHaveBeenCalledWith(
       mockDb,
-      expect.objectContaining({ name: 'WITHDRAWN_TEST' })
+      expect.objectContaining({ name: 'REMOVED_TEST' })
     )
   })
 
-  test('should not proceed if feature control has already been withdrawn', async () => {
+  test('should not proceed if feature control has already been removed', async () => {
     readdirSync.mockReturnValue(['test.yml'])
     readFileSync.mockReturnValue('content')
     load.mockReturnValue({
-      name: 'WITHDRAWN_TEST',
+      name: 'REMOVED_TEST',
       displayName: 'Test Control',
       type: 'boolean',
       description: 'desc',
@@ -137,15 +137,15 @@ describe('informBrokerOfFeatureControls', () => {
       initial_value: [{ name: 'default', value: true }]
     })
     findFeatureControlByName.mockResolvedValue({
-      name: 'WITHDRAWN_TEST',
-      notifiedWithdrawn: true
+      name: 'REMOVED_TEST',
+      notifiedRemoved: true
     })
 
     await informBrokerOfFeatureControls(mockServer)
 
     expect(mockLogger.info).toHaveBeenCalledWith(
       expect.stringContaining(
-        'Feature control WITHDRAWN_TEST is up to date or been withdrawn, will not inform config-broker'
+        'Feature control REMOVED_TEST is up to date or been removed, will not inform config-broker'
       )
     )
     expect(upsertFeatureControl).not.toHaveBeenCalled()
