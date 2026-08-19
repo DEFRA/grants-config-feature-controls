@@ -40,4 +40,8 @@ export const mongoDb = {
 
 async function createIndexes(db) {
   await db.collection('mongo-locks').createIndex({ id: 1 })
+
+  const FEATURE_CONTROL_COLLECTION_NAME = 'feature-controls'
+  await db.collection(FEATURE_CONTROL_COLLECTION_NAME).createIndex({ name: 1 })
+  await db.collection(FEATURE_CONTROL_COLLECTION_NAME).createIndex({ notifiedExpired: 1, expiryDate: 1 })
 }

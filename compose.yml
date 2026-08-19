@@ -40,7 +40,7 @@ services:
     volumes:
       - ./src:/home/node/src
       - ./package.json:/home/node/package.json
-      - ./configurations:/home/node/configurations
+      - ./feature-controls:/home/node/feature-controls
       - ./.env:/home/node/.env
 
 ################################################################################
