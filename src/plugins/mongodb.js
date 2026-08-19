@@ -43,5 +43,7 @@ async function createIndexes(db) {
 
   const FEATURE_CONTROL_COLLECTION_NAME = 'feature-controls'
   await db.collection(FEATURE_CONTROL_COLLECTION_NAME).createIndex({ name: 1 })
-  await db.collection(FEATURE_CONTROL_COLLECTION_NAME).createIndex({ notifiedExpired: 1, expiryDate: 1 })
+  await db
+    .collection(FEATURE_CONTROL_COLLECTION_NAME)
+    .createIndex({ notifiedExpired: 1, expiryDate: 1 })
 }
