@@ -55,7 +55,7 @@ export const notifyFeatureControlExpired = async (payload, server) => {
   )
 }
 
-export const notifyFeatureControlWithdrawn = async (payload, server) => {
+export const notifyFeatureControlRemoved = async (payload, server) => {
   await notify(
     {
       method: 'PUT',
@@ -63,9 +63,9 @@ export const notifyFeatureControlWithdrawn = async (payload, server) => {
       path: '/status'
     },
     server,
-    `Successfully notified the config broker about feature control withdrawn '${payload.name}'`,
-    `Failed to notify the config broker about feature control withdrawn '${payload.name}'.`,
-    `Error notifying the config broker about feature control withdrawn '${payload.name}':`
+    `Successfully notified the config broker about feature control removed '${payload.name}'`,
+    `Failed to notify the config broker about feature control removed '${payload.name}'.`,
+    `Error notifying the config broker about feature control removed '${payload.name}':`
   )
 }
 

@@ -3,7 +3,7 @@ import {
   upsertFeatureControl,
   findNewlyExpiredFeatureControls,
   setFeatureControlToExpired,
-  setFeatureControlToWithdrawn
+  setFeatureControlToRemoved
 } from './feature-control-repository.js'
 
 describe('featureControlRepository', () => {
@@ -98,17 +98,17 @@ describe('featureControlRepository', () => {
       expect(result.notifiedExpired).toBe(true)
     })
   })
-  describe('setFeatureControlToWithdrawn', () => {
-    test('should set notifiedWithdrawn to true', async () => {
-      const featureControl = { name: 'TO_BE_WITHDRAWN' }
+  describe('setFeatureControlToRemoved', () => {
+    test('should set notifiedRemoved to true', async () => {
+      const featureControl = { name: 'TO_BE_REMOVED' }
       await db.collection('feature-controls').insertOne(featureControl)
 
-      await setFeatureControlToWithdrawn(db, featureControl)
+      await setFeatureControlToRemoved(db, featureControl)
 
       const result = await db
         .collection('feature-controls')
-        .findOne({ name: 'TO_BE_WITHDRAWN' })
-      expect(result.notifiedWithdrawn).toBe(true)
+        .findOne({ name: 'TO_BE_REMOVED' })
+      expect(result.notifiedRemoved).toBe(true)
     })
   })
 })

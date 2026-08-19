@@ -1,0 +1,16 @@
+---
+name: EXAMPLE_REMOVED
+displayName: Example Control (Removed)
+type: string
+description: Example removed feature control, should be removed from dev/test. Definition updates not allowed as part of being removed.
+scopes:
+  - service.config-management
+owner: Grants Framework
+expiryDate: 2030-01-01
+initial_value:
+  - name: default
+    value: 'removed example'
+environments:
+  - local
+  - dev
+  - test
