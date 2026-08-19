@@ -12,5 +12,3 @@ initial_value:
     value: 'removed example'
 environments:
   - local
-  - dev
-  - test
