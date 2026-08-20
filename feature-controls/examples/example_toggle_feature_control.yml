@@ -1,6 +1,6 @@
 ---
 name: EXAMPLE_TOGGLE
-displayName: Example Control (Toggle)
+displayName: Example Control (Toggle) TEMP
 type: boolean
 description: Example 'boolean' type feature control
 scopes:

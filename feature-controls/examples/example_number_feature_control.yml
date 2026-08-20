@@ -6,7 +6,7 @@ description: Example 'number' type feature control
 scopes:
   - service.config-management
 owner: Grants Framework
-expiryDate: 2030-01-01
+expiryDate: 2033-01-01
 initial_value:
   - name: default
     value: 2

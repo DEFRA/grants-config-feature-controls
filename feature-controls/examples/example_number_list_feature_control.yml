@@ -5,6 +5,7 @@ type: list-number
 description: Example 'list-number' type feature control
 scopes:
   - service.config-management
+  - service.temp-for-demo
 owner: Grants Framework
 expiryDate: 2030-01-01
 initial_value:

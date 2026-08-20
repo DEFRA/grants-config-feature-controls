@@ -1,12 +1,16 @@
 ---
 name: EXAMPLE_TEXT
-displayName: Example Control (Text)
+displayName: Example Control (Text) TEMP
 type: string
-description: Example 'string' type feature control
+description: Example 'string' type feature control TEMP test all
 scopes:
   - service.config-management
-owner: Grants Framework
-expiryDate: 2030-01-01
+  - service.temp-for-demo
+owner: Grants Framework TEMP
+expiryDate: 2033-01-01
+roleRequired:
+  default:
+    - "FGF.Basic"
 initial_value:
   - name: default
     value: 'text value - default'

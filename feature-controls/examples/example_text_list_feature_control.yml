@@ -2,7 +2,7 @@
 name: EXAMPLE_TEXT_LIST
 displayName: Example Control (Text List)
 type: list-string
-description: Example 'list-string' type feature control
+description: Example 'list-string' type feature control TEMP
 scopes:
   - service.config-management
   - service.temp-for-demo
