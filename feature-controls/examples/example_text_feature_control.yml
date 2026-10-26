@@ -1,6 +1,6 @@
 ---
 name: EXAMPLE_TEXT
-displayName: Example Control (Text) TEMP
+displayName: Example Control (Text)
 type: string
 description: Example 'string' type feature control TEMP test all
 scopes:
